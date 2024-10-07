@@ -1,16 +1,24 @@
-; Print Hello & go into infinite loop
+; Global offset
+[org 0x7c00]
+
+; will work
 mov ah, 0x0e ; tty mode
-mov al, 'H'
-int 0x10
-mov al, 'e'
-int 0x10
-mov al, 'l'
-int 0x10
-int 0x10 ; 'l' is still on al
-mov al, 'o'
+mov al, [the_secret]
+int 10h
+
+; wont work - we will print offset
+mov al, the_secret
+int 10h
+
+; wont work
+mov bx, the_secret
+mov al, [bx]
 int 0x10
 
 jmp $ ; jump to current address = infinite loop
+
+the_secret:
+    db 'X'
 
 ; Fill with 510 zeros minus the size of the previous code
 times 510 - ($-$$) db 0
