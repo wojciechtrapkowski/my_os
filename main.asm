@@ -1,24 +1,39 @@
 ; Global offset
 [org 0x7c00]
 
-; will work
+; address far away from 0x7c00, so we won't get overwritten
+mov bp, 0x8000 ; bp points to the bottom of stack
+mov sp, bp ; sp points to the top
+
+push 'A'
+push 'B'
+push 'C'
+
 mov ah, 0x0e ; tty mode
-mov al, [the_secret]
+mov al, [bp-2]
+int 10h
+mov al, [bp-4]
+int 10h
+mov al, [bp-6]
 int 10h
 
-; wont work - we will print offset
-mov al, the_secret
+push 'A'
+push 'B'
+push 'C'
+
+pop bx
+mov al, bl
 int 10h
 
-; wont work
-mov bx, the_secret
-mov al, [bx]
-int 0x10
+pop bx
+mov al, bl
+int 10h
+
+pop bx
+mov al, bl
+int 10h
 
 jmp $ ; jump to current address = infinite loop
-
-the_secret:
-    db 'X'
 
 ; Fill with 510 zeros minus the size of the previous code
 times 510 - ($-$$) db 0
