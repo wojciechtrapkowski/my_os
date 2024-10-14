@@ -11,3 +11,23 @@ Launch on emulator:
 Inspect binary
 
 ```xxd file.bin```
+
+Compiling
+
+i386-elf-gcc -ffreestanding -c function.c -o function.o
+
+Examining generated assembly code
+
+i386-elf-objdump -d function.o
+
+Checking byte code
+
+xxd file
+
+Linking
+
+i386-elf-ld -o function.bin -Ttext 0x0 --oformat binary function.o
+
+Disassembling
+
+ndisasm -b 32 function.bin

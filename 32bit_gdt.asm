@@ -50,8 +50,8 @@ gdt_data:
 
 gdt_end:
 
-; GDT descriptor
-gdt_descriptor:
+; GDT descriptor - this will be in GDT register
+gdt_descriptor: 
     dw gdt_end - gdt_start - 1 ; size (16 bit), always one less of its true size
     dd gdt_start ; address (32 bit)
 
