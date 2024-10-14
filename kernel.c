@@ -4,6 +4,12 @@ void dummy_test_entrypoint() {
 
 void main() {
     char* video_memory = (char*)(0xb8000);
-    *video_memory = 'X';
-    *(video_memory+2) = 'Y';
+    int index = 1;
+    for (int i=0; i<25; i += 1) {
+        for (int j=0; j<80; j+=1) {
+            index = (i * 160) + (j*2);
+           *(video_memory + index) = 'X';
+           *(video_memory + index + 1) = 0x09;
+        }
+    }
 }

@@ -30,7 +30,7 @@ load_kernel:
 
     mov bx, KERNEL_OFFSET
     mov dh, 2 ; load 2 sectors
-    mov dl, [BOOT_DRIVE]
+    ; mov dl, [BOOT_DRIVE]
     call disk_load
     ret
     
