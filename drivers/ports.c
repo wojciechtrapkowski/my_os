@@ -26,7 +26,7 @@ void port_byte_out (u16 port, u8 data) {
         * "d" (port) means the input operand (port) is allocated in the dx register
     */
 
-    __asm__("out %%al, %%dx" : : "a" (data), "d" (port));
+    __asm__  __volatile__("out %%al, %%dx" : : "a" (data), "d" (port));
 }
 
 
@@ -37,5 +37,5 @@ u16 port_word_in (u16 port) {
 }
 
 void port_word_out (u16 port, u16 data) {
-    __asm__("out %%ax, %%dx" : : "a" (data), "d" (port));
+    __asm__  __volatile__("out %%ax, %%dx" : : "a" (data), "d" (port));
 }

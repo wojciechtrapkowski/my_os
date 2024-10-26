@@ -4,6 +4,8 @@
         "screen.h": "c",
         "isr.h": "c",
         "types.h": "c",
-        "util.h": "c"
+        "util.h": "c",
+        "keyboard.h": "c",
+        "idt.h": "c"
     }
 }

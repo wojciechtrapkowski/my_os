@@ -27,10 +27,11 @@ run: os-image.bin
 
 # Open the connection to qemu and load our kernel-object file with symbols
 debug: os-image.bin kernel.elf
-	qemu-system-i386 -s -fda os-image.bin -S -d guest_errors,int & 
+	qemu-system-i386 -s -fda os-image.bin -S -d int & 
 	${GDB} -ex "target remote localhost:1234" -ex "symbol-file kernel.elf"
 
 # Flag -monitor stdio - means that we can interact with qemu through the terminal
+# -d guest_errors,int - means that we want to see the errors in the terminal
 
 # Generic rules for wildcards
 # To make an object, always compile from its .c
