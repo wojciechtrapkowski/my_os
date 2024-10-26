@@ -1,7 +1,10 @@
 #include "isr.h"
 #include "idt.h"
-#include "../kernel/util.h"
+#include "timer.h"
+#include "../libc/mem.h"
+#include "../libc/string.h"
 #include "../drivers/screen.h"
+#include "../drivers/keyboard.h"
 
 isr_t interrupt_handlers[256];
 
@@ -112,6 +115,14 @@ char *exception_messages[] = {
     "Reserved",
     "Reserved"
 };
+
+void irq_install() {
+    __asm__ volatile("sti");
+    /* IRQ0: timer */
+    init_timer(50);
+    /* IRQ1: keyboard */
+    init_keyboard();
+}
 
 void isr_handler(registers_t r) {
     kprint("received interrupt: ");

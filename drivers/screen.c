@@ -1,6 +1,7 @@
 #include "screen.h"
-#include "ports.h"
-#include "../kernel/util.h"
+#include "../cpu/ports.h"
+#include "../libc/mem.h"
+#include "../libc/string.h"
 
 /* Declaration of private functions */
 int get_cursor_offset();
@@ -19,6 +20,10 @@ int get_offset_col(int offset);
  * If col, row, are negative, we will use the current offset
  */
 void kprint_at(char *message, int col, int row) {
+    int current_row = get_offset_row(get_cursor_offset());
+    int current_col = get_offset_col(get_cursor_offset());
+    int revert_to_previous_offset = (col != -1) && (row != -1);
+
     /* Set cursor if col/row are negative */
     int offset;
     if (col >= 0 && row >= 0)
@@ -37,10 +42,30 @@ void kprint_at(char *message, int col, int row) {
         row = get_offset_row(offset);
         col = get_offset_col(offset);
     }
+        
+    // When we explicitly print at certain location, we should not move the cursor
+    if (revert_to_previous_offset) {
+        int previousOffset = get_offset(current_col, current_row);
+        set_cursor_offset(previousOffset);
+    }
 }
 
 void kprint(char *message) {
     kprint_at(message, -1, -1);
+}
+
+void kprint_backspace() {
+    int offset = get_cursor_offset()-2;
+    int row = get_offset_row(offset);
+    int col = get_offset_col(offset);
+    print_char(0x08, col, row, WHITE_ON_BLACK);
+}
+
+void kprepare_space_for_info() {
+    // We will reserve first row for information
+    // TODO: Fix on scrolling
+    int offset = get_offset(0, 2);
+    set_cursor_offset(offset);
 }
 
 
@@ -75,6 +100,9 @@ int print_char(char c, int col, int row, char attr) {
     if (c == '\n') {
         row = get_offset_row(offset);
         offset = get_offset(0, row+1);
+    } else if (c == 0x08) { /* Backspace */
+        vidmem[offset] = ' ';
+        vidmem[offset+1] = attr;
     } else {
         vidmem[offset] = c;
         vidmem[offset+1] = attr;

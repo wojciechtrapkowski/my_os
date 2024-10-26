@@ -6,6 +6,10 @@
         "types.h": "c",
         "util.h": "c",
         "keyboard.h": "c",
-        "idt.h": "c"
+        "idt.h": "c",
+        "timer.h": "c",
+        "string.h": "c",
+        "function.h": "c",
+        "mem.h": "c"
     }
 }

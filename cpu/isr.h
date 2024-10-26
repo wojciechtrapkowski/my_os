@@ -2,7 +2,10 @@
 #define ISR_H
 
 #include "types.h"
-#include "../drivers/ports.h"
+#include "ports.h"
+#include "../libc/string.h"
+#include "../libc/mem.h"
+
 
 /* ISRs reserved for CPU exceptions */
 extern void isr0();
@@ -81,6 +84,7 @@ typedef struct {
 
 void isr_install();
 void isr_handler(registers_t r);
+void irq_install();
 
 typedef void (*isr_t)(registers_t);
 void register_interrupt_handler(u8 n, isr_t handler);

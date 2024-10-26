@@ -1,5 +1,5 @@
-C_SOURCES = $(wildcard kernel/*.c drivers/*.c cpu/*.c)
-HEADERS = $(wildcard kernel/*.h drivers/*.h cpu/*.h)
+C_SOURCES = $(wildcard kernel/*.c drivers/*.c cpu/*.c libc/*.c)
+HEADERS = $(wildcard kernel/*.h drivers/*.h cpu/*.h libc/*.h)
 # Nice syntax for file extension replacement
 OBJ = ${C_SOURCES:.c=.o cpu/interrupt.o}
 
@@ -7,7 +7,8 @@ OBJ = ${C_SOURCES:.c=.o cpu/interrupt.o}
 CC = /usr/local/i386elfgcc/bin/i386-elf-gcc
 GDB = /usr/local/i386elfgcc/bin/i386-elf-gdb
 # -g: Use debugging symbols in gcc
-CFLAGS = -m32 -ffreestanding -O2 -nostdlib -nostdinc -gdwarf-3
+CFLAGS = -g -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector -nostartfiles -nodefaultlibs \
+		 -Wall -Wextra -Werror  -gdwarf-3
 
 # First rule is run by default
 os-image.bin: boot/bootsect.bin kernel.bin
@@ -32,6 +33,7 @@ debug: os-image.bin kernel.elf
 
 # Flag -monitor stdio - means that we can interact with qemu through the terminal
 # -d guest_errors,int - means that we want to see the errors in the terminal
+# right now hard disk doesnt work, due to the fact that is to small
 
 # Generic rules for wildcards
 # To make an object, always compile from its .c
@@ -46,4 +48,4 @@ debug: os-image.bin kernel.elf
 
 clean:
 	rm -rf *.bin *.dis *.o os-image.bin *.elf
-	rm -rf kernel/*.o boot/*.bin drivers/*.o boot/*.o cpu/*.o
+	rm -rf kernel/*.o boot/*.bin drivers/*.o boot/*.o cpu/*.o libc/*.o

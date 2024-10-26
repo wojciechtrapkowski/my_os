@@ -1,23 +1,23 @@
 #include "timer.h"
-#include "../drivers/screen.h"
-#include "../kernel/util.h"
 #include "isr.h"
+#include "../drivers/screen.h"
+#include "../libc/string.h"
+#include "../libc/mem.h"
 
 u32 tick = 0;
 
 static void timer_callback(registers_t regs) {
     tick++;
-    kprint("Tick: ");
-    
+
     char tick_ascii[256];
     int_to_ascii(tick, tick_ascii);
-    kprint(tick_ascii);
-    kprint("\n");
+    kprint_at(tick_ascii, 6, 0);
 }
 
 void init_timer(u32 freq) {
     /* Install the function we just wrote */
     register_interrupt_handler(IRQ0, timer_callback);
+    kprint_at("Tick: ", 0, 0);
 
     /* Get the PIT value: hardware clock at 1193180 Hz */
     u32 divisor = 1193180 / freq;
