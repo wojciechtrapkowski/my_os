@@ -1,9 +1,7 @@
 #include "../drivers/screen.h"
 #include "util.h"
-
-/* This will force us to create a kernel entry function instead of jumping to kernel.c:0x00 */
-void dummy_test_entrypoint() {
-}
+#include "../cpu/isr.h"
+#include "../cpu/idt.h"
 
 void test_whole_screen() {
     char* video_memory = (char*)(0xb8000);
@@ -18,17 +16,7 @@ void test_whole_screen() {
 }
 
 void main() {
-
+    isr_install();
     clear_screen();
-
-    /* Fill up the screen */
-    int i = 0;
-    for (i = 0; i < 24; i++) {
-        char str[255];
-        int_to_ascii(i, str);
-        kprint_at(str, 0, i);
-    }
-
-    kprint_at("This text forces the kernel to scroll. Row 0 will disappear. ", 60, 24);
-    kprint("And with this text, the kernel will scroll again, and row 1 will disappear too!");
+    __asm__ __volatile__("int $2");
 }

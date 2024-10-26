@@ -1,0 +1,2 @@
+https://wiki.osdev.org/QEMU
+https://wiki.osdev.org/VGA_Hardware#Port_0x3C4,_0x3CE,_0x3D4

@@ -1,7 +1,12 @@
-#pragma once
-unsigned char port_byte_in(unsigned char port);
-void port_byte_out(unsigned char port, unsigned char data);
+#ifndef PORTS_H
+#define PORTS_H
 
-unsigned short port_word_in(unsigned short port);
-void port_word_out(unsigned short port, unsigned short data);
+#include "../cpu/types.h"
+
+unsigned char port_byte_in (u16 port);
+void port_byte_out (u16 port, u8 data);
+unsigned short port_word_in (u16 port);
+void port_word_out (u16 port, u16 data);
+
+#endif
 
