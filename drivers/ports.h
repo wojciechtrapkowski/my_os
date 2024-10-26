@@ -1,0 +1,6 @@
+unsigned char port_byte_in(unsigned char port);
+void port_byte_out(unsigned char port, unsigned char data);
+
+unsigned char port_word_in(unsigned short port);
+void port_word_out(unsigned short port, unsigned short data);
+
