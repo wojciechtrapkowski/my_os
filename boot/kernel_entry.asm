@@ -1,4 +1,4 @@
 [bits 32]
-extern main
+[extern main]
 call main
 jmp $ ; hang when return from kernel

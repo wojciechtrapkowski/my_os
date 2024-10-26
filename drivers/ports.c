@@ -1,5 +1,7 @@
+#include "ports.h"
+
 // @brief Port I/O functions
-unsigned char port_byte_in(unsigned short port) {
+unsigned char port_byte_in(unsigned char port) {
     unsigned char result;
 
     /*
@@ -14,7 +16,7 @@ unsigned char port_byte_in(unsigned short port) {
     return result;
 }
 
-void port_byte_out(unsigned short port, unsigned char data) {
+void port_byte_out(unsigned char port, unsigned char data) {
     /*
         * Inline assembly syntax:
         * out %al, %dx

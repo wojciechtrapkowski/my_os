@@ -29,8 +29,8 @@ load_kernel:
     call print_nl
 
     mov bx, KERNEL_OFFSET
-    mov dh, 2 ; load 2 sectors
-    ; mov dl, [BOOT_DRIVE]
+    mov dh, 16 ; load 2 sectors
+    mov dl, [BOOT_DRIVE]
     call disk_load
     ret
     
@@ -50,7 +50,3 @@ MSG_LOAD_KERNEL db "Loading kernel", 0
 ; bootsector 0 
 times 510-($-$$) db 0
 dw 0xaa55
-
-; ; boot sector 1
-; times 256 dw 0xdada ; boot sector 2
-; times 256 dw 0xface ; boot sector 3
