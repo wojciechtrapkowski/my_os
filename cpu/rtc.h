@@ -6,5 +6,6 @@
 void print_rtc_time();
 void print_rtc_date();
 void print_rtc_datetime();
+void init_rtc();
 
 #endif 

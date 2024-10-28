@@ -2,6 +2,7 @@
 #include "../cpu/ports.h"
 #include "../libc/string.h"
 #include "../drivers/screen.h"
+#include "isr.h"    
 
 #define CURRENT_YEAR 2024
 
@@ -17,6 +18,8 @@
 #define RTC_YEAR    0x09
 #define RTC_STATUS_A 0x0A
 #define RTC_STATUS_B 0x0B
+#define RTC_STATUS_C 0x0C
+#define IRQ_RTC IRQ8
 
 // Global variables to store time
 static uint32_t seconds, minute, hour;
@@ -145,4 +148,53 @@ void print_rtc_datetime() {
     datetime_str[19] = '\0';
     
     kprint_at(datetime_str, 13, 0);
+}
+
+void rtc_handler(registers_t *regs) {
+    static int tick = 0;
+    
+    // Must read Status Register C to acknowledge the interrupt
+    port_byte_out(CMOS_ADDR, RTC_STATUS_C);
+    port_byte_in(CMOS_DATA);
+    
+    tick++;
+    if (tick % 2 == 0) { // Update every second (assuming 2Hz rate)
+        print_rtc_datetime();
+    }
+    
+    // Send EOI to PIC
+    port_byte_out(0xA0, 0x20); // Send EOI to slave PIC
+    port_byte_out(0x20, 0x20); // Send EOI to master PIC
+}
+
+void init_rtc() {
+    // So the time is printed right away
+    print_rtc_datetime();
+
+    uint32_t status;
+    
+    // Disable interrupts temporarily
+    __asm__ __volatile__("cli");
+    
+    // Select Status Register B and disable NMI
+    port_byte_out(CMOS_ADDR, RTC_STATUS_B | 0x80);
+    
+    // Read current value
+    status = port_byte_in(CMOS_DATA);
+    
+    // Write the previous value, but set PIE (Periodic Interrupt Enable)
+    port_byte_out(CMOS_ADDR, RTC_STATUS_B | 0x80);
+    port_byte_out(CMOS_DATA, status | 0x40);
+    
+    // Set rate (Status Register A)
+    port_byte_out(CMOS_ADDR, RTC_STATUS_A);
+    status = port_byte_in(CMOS_DATA);
+    port_byte_out(CMOS_ADDR, RTC_STATUS_A);
+    port_byte_out(CMOS_DATA, (status & 0xF0) | 0x0F); // Rate: 32768Hz >> (15-6) = 2Hz
+    
+    // Register our RTC handler
+    register_interrupt_handler(IRQ_RTC, rtc_handler);
+    
+    // Re-enable interrupts
+    __asm__ __volatile__("sti");
 }

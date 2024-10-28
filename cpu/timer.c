@@ -7,15 +7,11 @@
 #include "rtc.h"
 
 uint32_t tick = 0;
-#define TICKS_PER_SECOND 50
 
 static void timer_callback(registers_t* regs) {
     UNUSED(regs);
     tick++;
 
-    if (tick % TICKS_PER_SECOND == 0) {
-        print_rtc_datetime();
-    }
     // PRINT TICKS
     // char tick_ascii[256];
     // int_to_ascii(tick, tick_ascii);
