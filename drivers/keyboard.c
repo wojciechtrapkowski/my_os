@@ -6,6 +6,8 @@
 #include "../libc/function.h"
 #include "../kernel/kernel.h"
 
+#include <stdint.h>
+
 #define BACKSPACE 0x0E
 #define ENTER 0x1C
 
@@ -26,9 +28,9 @@ const char sc_ascii[] = { '?', '?', '1', '2', '3', '4', '5', '6',
         'B', 'N', 'M', ',', '.', '/', '?', '?', '?', ' '};
 
 
-static void keyboard_callback(registers_t regs) {
-    __asm__("cli");
-     u8 scancode = port_byte_in(0x60);
+static void keyboard_callback(registers_t* regs) {
+    asm("cli");
+     uint8_t scancode = port_byte_in(0x60);
 
     /* The PIC leaves us the scancode in port 0x60 */
     if (scancode > SC_MAX) return;
@@ -49,7 +51,7 @@ static void keyboard_callback(registers_t regs) {
     }
     UNUSED(regs);
 
-    __asm__("sti");
+    asm("sti");
 
 }
 

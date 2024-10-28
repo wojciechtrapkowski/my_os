@@ -2,8 +2,9 @@
 #define TIMER_H
 
 #include "../libc/string.h"
-#include "type.h"
 
-void init_timer(u32 freq);
+#include <stdint.h>
+
+void init_timer(uint32_t freq);
 
 #endif
