@@ -126,17 +126,12 @@ void print_rtc_datetime() {
     kprint_at(datetime_str, TEXT_POSITION_X, TEXT_POSITION_Y);
 }
 
-void rtc_handler(registers_t *regs) {
-    static int tick = 0;
-    
+void rtc_handler(registers_t *regs) {    
     // Must read Status Register C to acknowledge the interrupt
     port_byte_out(CMOS_ADDR, RTC_STATUS_C);
     port_byte_in(CMOS_DATA);
     
-    tick++;
-    if (tick % RTC_RATE == 0) { // Update every second (assuming 2Hz rate)
-        print_rtc_datetime();
-    }
+    print_rtc_datetime();
     
     // Send EOI to PIC
     port_byte_out(0xA0, 0x20); // Send EOI to slave PIC
@@ -152,7 +147,7 @@ void init_rtc() {
     // Disable interrupts temporarily
     __asm__ __volatile__("cli");
     
-    // Select Status Register B and disable NMI
+    // Select Status Register B and disable NMI (due to the fact, that if it happens the RTC can remain in an undefined state)
     port_byte_out(CMOS_ADDR, RTC_STATUS_B | 0x80);
     
     // Read current value
@@ -166,7 +161,7 @@ void init_rtc() {
     port_byte_out(CMOS_ADDR, RTC_STATUS_A);
     status = port_byte_in(CMOS_DATA);
     port_byte_out(CMOS_ADDR, RTC_STATUS_A);
-    port_byte_out(CMOS_DATA, (status & 0xF0) | 0x0F); // Rate: 32768Hz >> (15-6) = 2Hz
+    port_byte_out(CMOS_DATA, (status & 0xF0) | 0x0F & RTC_RATE); // Rate: 32768Hz >> (15-6) = 2Hz
     
     // Register our RTC handler
     register_interrupt_handler(IRQ_RTC, rtc_handler);
