@@ -18,6 +18,15 @@ void int_to_ascii(int n, char str[]) {
     reverse(str);
 }
 
+void int_to_ascii_padded(int n, char *str) {
+    if (n < 10) {
+        str[0] = '0';
+        int_to_ascii(n, str + 1);
+    } else {
+        int_to_ascii(n, str);
+    }
+}
+
 void hex_to_ascii(int n, char str[]) {
     append(str, '0');
     append(str, 'x');

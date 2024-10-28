@@ -11,6 +11,7 @@
         "string.h": "c",
         "function.h": "c",
         "mem.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "rtc.h": "c"
     }
 }
