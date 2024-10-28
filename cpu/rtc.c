@@ -20,11 +20,16 @@
 #define RTC_STATUS_B 0x0B
 #define RTC_STATUS_C 0x0C
 #define IRQ_RTC IRQ8
+#define RTC_RATE 2
+
+#define TEXT_POSITION_X 13
+#define TEXT_POSITION_Y 0
 
 // Global variables to store time
 static uint32_t seconds, minute, hour;
 static uint32_t day, month, year;
 
+// We won't need that anymore, because we work with interrupts
 static int get_update_in_progress_flag() {
     port_byte_out(CMOS_ADDR, RTC_STATUS_A);
     return (port_byte_in(CMOS_DATA) & 0x80);
@@ -36,12 +41,7 @@ static uint32_t get_rtc_register(uint32_t reg) {
 }
 
 static void read_rtc() {
-    uint32_t last_seconds, last_minute, last_hour;
-    uint32_t last_day, last_month, last_year;
     uint32_t registerB;
-
-    // Wait until an update isn't in progress
-    while (get_update_in_progress_flag());
 
     seconds = get_rtc_register(RTC_SECONDS);
     minute = get_rtc_register(RTC_MINUTES);
@@ -49,29 +49,6 @@ static void read_rtc() {
     day = get_rtc_register(RTC_DAY);
     month = get_rtc_register(RTC_MONTH);
     year = get_rtc_register(RTC_YEAR);
-    
-    // Read until we get the same values twice
-    do {
-        last_seconds = seconds;
-        last_minute = minute;
-        last_hour = hour;
-        last_day = day;
-        last_month = month;
-        last_year = year;
-
-        while (get_update_in_progress_flag());
-        
-        seconds = get_rtc_register(RTC_SECONDS);
-        minute = get_rtc_register(RTC_MINUTES);
-        hour = get_rtc_register(RTC_HOURS);
-        day = get_rtc_register(RTC_DAY);
-        month = get_rtc_register(RTC_MONTH);
-        year = get_rtc_register(RTC_YEAR);
-    } while(
-        last_seconds != seconds || last_minute != minute || 
-        last_hour != hour || last_day != day || 
-        last_month != month || last_year != year
-    );
 
     registerB = get_rtc_register(RTC_STATUS_B);
 
@@ -91,7 +68,6 @@ static void read_rtc() {
     }
 
     // Calculate the full (4-digit) year
-    
     year += (CURRENT_YEAR / 100) * 100;
     if(year < CURRENT_YEAR) year += 100;
 }
@@ -109,7 +85,7 @@ void print_rtc_time() {
     int_to_ascii(seconds, time_str + 6);
     time_str[8] = '\0';
     
-    kprint_at(time_str, 13, 0);
+    kprint_at(time_str, TEXT_POSITION_X, TEXT_POSITION_Y);
 }
 
 void print_rtc_date() {
@@ -125,7 +101,7 @@ void print_rtc_date() {
     int_to_ascii(year, date_str + 6);
     date_str[10] = '\0';
     
-    kprint_at(date_str, 13, 0);
+    kprint_at(date_str, TEXT_POSITION_X, TEXT_POSITION_Y);
 }
 
 void print_rtc_datetime() {
@@ -147,7 +123,7 @@ void print_rtc_datetime() {
     int_to_ascii_padded(seconds, datetime_str + 17);
     datetime_str[19] = '\0';
     
-    kprint_at(datetime_str, 13, 0);
+    kprint_at(datetime_str, TEXT_POSITION_X, TEXT_POSITION_Y);
 }
 
 void rtc_handler(registers_t *regs) {
@@ -158,7 +134,7 @@ void rtc_handler(registers_t *regs) {
     port_byte_in(CMOS_DATA);
     
     tick++;
-    if (tick % 2 == 0) { // Update every second (assuming 2Hz rate)
+    if (tick % RTC_RATE == 0) { // Update every second (assuming 2Hz rate)
         print_rtc_datetime();
     }
     
