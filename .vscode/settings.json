@@ -3,7 +3,7 @@
         "ports.h": "c",
         "screen.h": "c",
         "isr.h": "c",
-        "types.h": "c",
+        "type.h": "c",
         "util.h": "c",
         "keyboard.h": "c",
         "idt.h": "c",
