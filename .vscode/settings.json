@@ -12,6 +12,7 @@
         "function.h": "c",
         "mem.h": "c",
         "stdint.h": "c",
-        "rtc.h": "c"
+        "rtc.h": "c",
+        "physical_memory_manager.h": "c"
     }
 }

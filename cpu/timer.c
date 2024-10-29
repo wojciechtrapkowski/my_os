@@ -4,7 +4,7 @@
 #include "../libc/string.h"
 #include "../libc/mem.h"
 #include "../libc/function.h"
-#include "rtc.h"
+#include "../drivers/rtc.h"    
 
 uint32_t tick = 0;
 

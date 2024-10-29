@@ -2,7 +2,7 @@
 #include "../cpu/ports.h"
 #include "../libc/string.h"
 #include "../drivers/screen.h"
-#include "isr.h"    
+#include "../cpu/isr.h"    
 
 #define CURRENT_YEAR 2024
 
