@@ -42,7 +42,7 @@ typedef struct page_directory
   Sets up the environment, page directories etc and
   enables paging.
 **/
-void initialise_paging();
+void init_paging();
 
 /**
   Causes the specified page directory to be loaded into the
@@ -57,9 +57,15 @@ void switch_page_directory(page_directory_t* new_dir);
 **/
 page_t* get_page(uint32_t address, int make, page_directory_t* dir);
 
-/**
-  Handler for page faults.
-**/
-void page_fault(registers_t regs);
+void page_fault(registers_t* regs);
+
+#define PANIC(msg) do { \
+    kprint("PANIC: "); \
+    kprint(msg); \
+    kprint("\n"); \
+    asm volatile("cli"); \
+    asm volatile("hlt"); \
+    for(;;); \
+} while(0)
 
 #endif

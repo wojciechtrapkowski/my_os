@@ -1,10 +1,6 @@
 #include "physical_memory_manager.h"
 #include "../drivers/screen.h"
 
-#define INDEX_FROM_BIT(a) (a/(8*4))
-#define OFFSET_FROM_BIT(a) (a%(8*4))
-#define PANIC(msg) kprint(msg);
-
 /* This should be computed at link time, but a hardcoded
  * value is fine for now. Remember that our kernel starts
  * at 0x1000 as defined on the Makefile */

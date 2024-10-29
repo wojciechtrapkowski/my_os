@@ -28,23 +28,21 @@ void int_to_ascii_padded(int n, char *str) {
 }
 
 void hex_to_ascii(int n, char str[]) {
-    append(str, '0');
-    append(str, 'x');
-    char zeros = 0;
-
-    int32_t tmp;
-    int i;
-    for (i = 28; i > 0; i -= 4) {
-        tmp = (n >> i) & 0xF;
-        if (tmp == 0 && zeros == 0) continue;
-        zeros = 1;
-        if (tmp > 0xA) append(str, tmp - 0xA + 'a');
-        else append(str, tmp + '0');
+    str[0] = '0';
+    str[1] = 'x';
+    str[2] = '\0'; // Marks the end of the string for append
+     
+    char hex_digits[] = "0123456789abcdef";
+    int i, digit;
+    uint8_t leading_zero = 1;
+    
+    for (i = 7; i >= 0; i--) {
+        digit = (n >> (i * 4)) & 0xF;
+        if (digit != 0 || !leading_zero || i == 0) {
+            leading_zero = 0;
+            append(str, hex_digits[digit]);
+        }
     }
-
-    tmp = n & 0xF;
-    if (tmp >= 0xA) append(str, tmp - 0xA + 'a');
-    else append(str, tmp + '0');
 }
 
 void reverse(char s[]) {

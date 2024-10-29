@@ -56,6 +56,12 @@ void kprint(char *message) {
     kprint_at(message, -1, -1);
 }
 
+void kprint_hex(uint32_t n) {
+    char buffer[32];
+    hex_to_ascii(n, buffer);
+    kprint(buffer);
+}
+
 void kprint_backspace() {
     int offset = get_cursor_offset()-2;
     int row = get_offset_row(offset);
