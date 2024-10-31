@@ -2,6 +2,30 @@
 #define PAGING_H
 
 #include "isr.h"
+#include "physical_memory_manager.h"
+
+// TODO: Find better place for this
+#define PANIC(msg) do { \
+    kprint("PANIC: "); \
+    kprint(msg); \
+    kprint("\n"); \
+    asm volatile("cli"); \
+    asm volatile("hlt"); \
+    for(;;); \
+} while(0)
+
+// Address masks
+#define TABLE_INDEX_MASK(x) ((x >> 22))           // Get table index
+#define PAGE_INDEX_MASK(x) ((x >> 12) & 0x3FF)    // Get index of page in table
+#define OFFSET_MASK(x) ((x) & 0xFFF)              // Get offset withing page
+#define PAGE_ALIGN (~(PAGE_SIZE - 1))
+
+// Page flags
+#define PAGE_PRESENT   0x1 
+#define PAGE_RW        0x2 
+#define PAGE_USER      0x4 
+#define PAGE_ACCESSED  0x20
+#define PAGE_DIRTY     0x40
 
 typedef struct page
 {
@@ -21,14 +45,7 @@ typedef struct page_table
 
 typedef struct page_directory
 {
-   /**
-      Array of pointers to pagetables.
-   **/
    page_table_t* tables[1024];
-   /**
-      Array of pointers to the pagetables above, but gives their *physical*
-      location, for loading into the CR3 register.
-   **/
    uint32_t tablesPhysical[1024];
    /**
       The physical address of tablesPhysical. This comes into play
@@ -38,34 +55,24 @@ typedef struct page_directory
    uint32_t physicalAddr;
 } page_directory_t;
 
-/**
-  Sets up the environment, page directories etc and
-  enables paging.
-**/
 void init_paging();
 
-/**
-  Causes the specified page directory to be loaded into the
-  CR3 register.
-**/
 void switch_page_directory(page_directory_t* new_dir);
-
-/**
-  Retrieves a pointer to the page required.
-  If make == 1, if the page-table in which this page should
-  reside isn't created, create it!
-**/
-page_t* get_page(uint32_t address, int make, page_directory_t* dir);
 
 void page_fault(registers_t* regs);
 
-#define PANIC(msg) do { \
-    kprint("PANIC: "); \
-    kprint(msg); \
-    kprint("\n"); \
-    asm volatile("cli"); \
-    asm volatile("hlt"); \
-    for(;;); \
-} while(0)
+page_directory_t* create_page_directory();
+
+void create_table(uint32_t address, page_directory_t* dir);
+
+page_t* create_page(uint32_t address, page_directory_t* dir);
+
+page_t* get_page(uint32_t address, page_directory_t* dir);
+
+void free_page(uint32_t address, page_directory_t* dir);
+
+void free_page_table(page_table_t* table);  
+
+void free_page_directory(page_directory_t* dir);
 
 #endif

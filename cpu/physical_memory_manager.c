@@ -1,36 +1,33 @@
 #include "physical_memory_manager.h"
-#include "../drivers/screen.h"
+#include "memory_consts.h"
 
 /* This should be computed at link time, but a hardcoded
  * value is fine for now. Remember that our kernel starts
  * at 0x1000 as defined on the Makefile */
-uint32_t free_mem_addr = 0x10000;
+static uint32_t free_mem_addr = 0x10000;
+static uint32_t* frames;
+static uint64_t n_frames;
 
-uint32_t* frames;
-size_t n_frames;
+void init_physical_memory_manager() {
+    n_frames = (uint64_t) NUMBER_OF_PAGE_DIRECTORIES * TABLES_PER_DIRECTORY * PAGES_PER_TABLE * PAGE_SIZE;
+
+    frames = (uint32_t*)kmalloc(n_frames / 32, 0, NULL);
+    memory_set(frames, 0, n_frames / 32);
+}
 
 // Static function to set a bit in the frames bitset
 static void set_frame(uint32_t frame_addr)
 {
-   uint32_t frame = frame_addr / 0x1000; // 4 kB
+   uint32_t frame = frame_addr / PAGE_SIZE; // 4 kB
    uint32_t idx = INDEX_FROM_BIT(frame);
    uint32_t off = OFFSET_FROM_BIT(frame);
    frames[idx] |= (0x1 << off);
 }
 
-// Static function to clear a bit in the frames bitset
-static void clear_frame(uint32_t frame_addr)
-{
-   uint32_t frame = frame_addr/0x1000;
-   uint32_t idx = INDEX_FROM_BIT(frame);
-   uint32_t off = OFFSET_FROM_BIT(frame);
-   frames[idx] &= ~(0x1 << off);
-}
-
 // Static function to test if a bit is set.
 static uint32_t test_frame(uint32_t frame_addr)
 {
-   uint32_t frame = frame_addr/0x1000;
+   uint32_t frame = frame_addr / PAGE_SIZE;
    uint32_t idx = INDEX_FROM_BIT(frame);
    uint32_t off = OFFSET_FROM_BIT(frame);
    return (frames[idx] & (0x1 << off));
@@ -63,42 +60,29 @@ static uint32_t find_first_free_frame()
 
 // Public functions
 
-// Function to allocate a frame
-void alloc_frame(page_t *page, int is_kernel, int is_writeable)
+// Function to assign a frame to a page
+uint32_t alloc_frame()
 {
-   if (page->frame != 0) {
-       // Frame was already allocated, return straight away.
-       return; 
-   } else {
-       uint32_t idx = find_first_free_frame(); 
-       
-       // idx is now the index of the first free frame.
+    uint32_t idx = find_first_free_frame(); 
 
-       if (idx == (uint32_t)-1)
-       {
-           // PANIC is just a macro that prints a message to the screen then hits an infinite loop.
-           PANIC("No free frames!");
-       }
-       set_frame(idx*0x1000); // this frame is now ours!
-       page->present = 1; // Mark it as present.
-       page->rw = (is_writeable)?1:0; // Should the page be writeable?
-       page->user = (is_kernel)?0:1; // Should the page be user-mode?
-       page->frame = idx;
-   }
+    // idx is now the index of the first free frame.
+
+    if (idx == (uint32_t)-1) {
+        // PANIC is just a macro that prints a message to the screen then hits an infinite loop.
+        PANIC("No free frames!");
+    }
+
+    set_frame(idx*PAGE_SIZE); // this frame is now ours!
+    return idx;
 }
 
-// Function to deallocate a frame.
-void free_frame(page_t *page)
+// Static function to clear a bit in the frames bitset
+void free_frame(uint32_t frame_addr)
 {
-   uint32_t frame;
-   if (!(frame=page->frame)) {
-       // The given page didn't actually have an allocated frame!
-       return; 
-   }
-   else {
-       clear_frame(frame); // Frame is now free again.
-       page->frame = 0x0; // Page now doesn't have a frame.
-   }
+   uint32_t frame = frame_addr / PAGE_SIZE;
+   uint32_t idx = INDEX_FROM_BIT(frame);
+   uint32_t off = OFFSET_FROM_BIT(frame);
+   frames[idx] &= ~(0x1 << off);
 }
 
 uint32_t kmalloc(size_t size, int align, uint32_t *phys_addr) {
@@ -111,5 +95,4 @@ uint32_t kmalloc(size_t size, int align, uint32_t *phys_addr) {
     free_mem_addr += size;
     return ret;
 }
-
 

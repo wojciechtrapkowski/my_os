@@ -1,86 +1,114 @@
 #include "paging.h"
-#include "physical_memory_manager.h"
-#include "../libc/mem.h"
-#include "isr.h"
-#include "../drivers/screen.h"
+#include "memory_consts.h"
 
-page_directory_t* current_directory;
+page_directory_t* current_directory = NULL;
 
 void enable_paging() {
     uint32_t cr0;
     asm volatile("mov %%cr0, %0": "=r"(cr0));
-    cr0 |= 0x00010000;     // Set Write Protec bit
+    cr0 |= 0x00010000;     // Set Write Protect bit
     cr0 |= 0x80000000;     // Set Paging bit
     asm volatile("mov %0, %%cr0":: "r"(cr0));
 }
 
-void init_paging()
-{
-    // The size of physical memory. For the moment we
-    // assume it is 16MB big.
-    uint32_t mem_end_page = 0x1000000;
+void init_paging() {
+    init_physical_memory_manager();
 
-    n_frames = mem_end_page / 0x1000;
-    frames = (uint32_t*)kmalloc(INDEX_FROM_BIT(n_frames), 0, NULL);
-    memory_set(frames, 0, INDEX_FROM_BIT(n_frames));
-
-    // Creating kernel page directory
-    page_directory_t* kernel_directory = (page_directory_t*)kmalloc(sizeof(page_directory_t), 1, NULL);
-    memory_set(kernel_directory, 0, sizeof(page_directory_t));
-    current_directory = kernel_directory;
-
-    // Map 16MB (4 page tables worth)
-    // We need to identity map (phys addr = virt addr) from
-    // 0x0 to the end of used memory, so we can access this
-    // transparently, as if paging wasn't enabled.
-    // NOTE that we use a while loop here deliberately.
-    // inside the loop body we actually change placement_address
-    // by calling kmalloc(). A while loop causes this to be
-    // computed on-the-fly rather than once at the start.
-    for(uint32_t i = 0; i < mem_end_page; i += 0x1000) {
-        uint32_t is_writeable = (i <= 0xBFFFF);
-        alloc_frame(get_page(i, 1, kernel_directory), /*is_kernel*/ 0, /*writable*/ is_writeable);
-    }
+    page_directory_t* kernel_directory = create_page_directory();
 
     register_interrupt_handler(14, page_fault);
 
     switch_page_directory(kernel_directory);
+
     enable_paging();
 }
 
 void switch_page_directory(page_directory_t* dir)
 {
    current_directory = dir;
-   asm volatile("mov %0, %%cr3":: "r"(&dir->tablesPhysical));
+   asm volatile("mov %0, %%cr3":: "r"(dir->tablesPhysical));
 }
 
-page_t* get_page(uint32_t address, int make, page_directory_t* dir)
-{
-   // Turn the address into an index
-   address /= 0x1000;
-   // Find the page table containing this address
-   uint32_t table_idx = address / 1024;
-   // If this table is already assigned
-   if (dir->tables[table_idx]) {
-       return &dir->tables[table_idx]->pages[address%1024];
-   }
-   else if(make) {
-       uint32_t tmp;
-       dir->tables[table_idx] = (page_table_t*)kmalloc(sizeof(page_table_t), 1,&tmp);
-       memory_set(dir->tables[table_idx], 0, 0x1000);
-       dir->tablesPhysical[table_idx] = tmp | 0x7; // PRESENT, RW, US.
-       return &dir->tables[table_idx]->pages[address%1024];
-   }
-   else {
-       return 0;
-   }
+page_directory_t* create_page_directory() {
+    // Allocate directory
+    page_directory_t* dir = (page_directory_t*) kmalloc(sizeof(page_directory_t), 1, NULL);
+    memory_set(dir, 0, sizeof(page_directory_t));
+
+    // Create few tables
+    for (uint32_t i = 0; i < NUMBER_OF_INITIAL_TABLES; i++) {
+        // Each table covers 4MB (22 bits)
+        create_table(i << 22, dir);
+    }
+
+    return dir;
+}
+
+void create_table(uint32_t address, page_directory_t* dir) {
+    uint32_t table_idx = TABLE_INDEX_MASK(address);
+    uint32_t tmp;
+    page_table_t* table = (page_table_t*) kmalloc(sizeof(page_table_t), 1, &tmp);
+    memory_set(table, 0, sizeof(page_table_t));
+    dir->tables[table_idx] = table;
+    dir->tablesPhysical[table_idx] = tmp | PAGE_PRESENT | PAGE_RW | PAGE_USER;
+    
+
+    // Create pages for this table
+    for (uint32_t i = 0; i < PAGES_PER_TABLE; i++) {
+        // Each page is 4KB (12 bits), so shift i by 12 and add to base address
+        create_page(address | (i << 12), dir);
+    }
+}
+
+page_t* create_page(uint32_t address, page_directory_t* dir) {
+    uint32_t table_idx = TABLE_INDEX_MASK(address);
+    uint32_t page_idx = PAGE_INDEX_MASK(address);
+    if (!dir->tables[table_idx]) {
+        create_table(address, dir);
+    }
+    page_t* page = &(dir->tables[table_idx]->pages[page_idx]);
+
+    // Frame was already allocated
+    if (page->frame != 0) {
+       return page; 
+    }
+
+    uint32_t idx = alloc_frame();
+    page->present = 1; // Mark it as present.
+    page->rw = 1; // Should the page be writeable?
+    page->user = 0; // Should the page be user-mode?
+    page->frame = idx;
+
+    return page;
+}
+
+page_t* get_page(uint32_t address, page_directory_t* dir) {
+    uint32_t table_idx = TABLE_INDEX_MASK(address);
+    uint32_t page_idx = PAGE_INDEX_MASK(address);
+
+    // Create page table only when needed - lazy allocation
+    if (!dir->tables[table_idx]) {
+        create_table(address, dir);
+    }
+
+    return &(dir->tables[table_idx]->pages[page_idx]);
+}
+
+
+void free_page(uint32_t address, page_directory_t* dir) {
+    page_t* page = get_page(address, dir);
+    if (page->frame == 0) {
+        return;
+    }
+
+    free_frame(page->frame);
+    page->frame = 0x0;
 }
 
 void page_fault(registers_t* regs) {
     // A page fault has occurred.
     // The faulting address is stored in the CR2 register.
     uint32_t faulting_address;
-    asm volatile("mov %%cr2, %0" : "=r" (faulting_address));
+    asm ("mov %%cr2, %0" : "=r" (faulting_address));
 
     // The error code gives us details of what happened.
     int present   = !(regs->err_code & 0x1); // Page not present
@@ -98,9 +126,6 @@ void page_fault(registers_t* regs) {
     kprint_hex(faulting_address);
     kprint(" ) \n");
 
-    // // TEMPORARY!!!
-    // // Skip the instruction that caused the fault
-    // unsigned char* instruction = (unsigned char*)regs->eip;
-    // int skip_bytes = (instruction[0] >= 0x88 && instruction[0] <= 0x8B) ? 2 : 1;
-    // regs->eip += skip_bytes;
+    // Try to handle page fault
+    get_page(faulting_address, current_directory);
 }

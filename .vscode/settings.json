@@ -16,6 +16,7 @@
         "physical_memory_manager.h": "c",
         "paging.h": "c",
         "stddef.h": "c",
-        "cstring": "c"
+        "cstring": "c",
+        "memory_consts.h": "c"
     }
 }
