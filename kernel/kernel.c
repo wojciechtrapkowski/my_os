@@ -21,10 +21,12 @@ void user_input(char *input) {
         asm volatile("hlt");
     } else if (strcmp(input, "PAGE") == 0) {
         // This should result in a page fault
+        // but should be handled by the kernel
+        // User sees 4 GB of memory
         uint32_t* ptr = (uint32_t*)0xA0000000; 
         *ptr = 123;
-
-     
+        uint32_t* ptr2 = (uint32_t*)0xFFFFFFFF; 
+        *ptr2 = 456;
     }
     kprint("You said: ");
     kprint(input);

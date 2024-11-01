@@ -43,12 +43,13 @@ typedef struct page_table
    page_t pages[1024];
 } page_table_t;
 
+
 typedef struct page_directory
 {
-   page_table_t* tables[1024];
-   uint32_t tablesPhysical[1024];
+   page_table_t* page_directory_entries[1024];
+   uint32_t page_directory_entries_physical[1024];
    /**
-      The physical address of tablesPhysical. This comes into play
+      The physical address of page_directory_entries_physical. This comes into play
       when we get our kernel heap allocated and the directory
       may be in a different location in virtual memory.
    **/

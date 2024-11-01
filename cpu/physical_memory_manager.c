@@ -9,7 +9,7 @@ static uint32_t* frames;
 static uint64_t n_frames;
 
 void init_physical_memory_manager() {
-    n_frames = (uint64_t) NUMBER_OF_PAGE_DIRECTORIES * TABLES_PER_DIRECTORY * PAGES_PER_TABLE * PAGE_SIZE;
+    n_frames = (uint64_t) TABLES_PER_DIRECTORY * PAGES_PER_TABLE * PAGE_SIZE;
 
     frames = (uint32_t*)kmalloc(n_frames / 32, 0, NULL);
     memory_set(frames, 0, n_frames / 32);

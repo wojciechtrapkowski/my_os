@@ -26,7 +26,7 @@ void init_paging() {
 void switch_page_directory(page_directory_t* dir)
 {
    current_directory = dir;
-   asm volatile("mov %0, %%cr3":: "r"(dir->tablesPhysical));
+   asm volatile("mov %0, %%cr3":: "r"(dir->page_directory_entries_physical));
 }
 
 page_directory_t* create_page_directory() {
@@ -48,8 +48,8 @@ void create_table(uint32_t address, page_directory_t* dir) {
     uint32_t tmp;
     page_table_t* table = (page_table_t*) kmalloc(sizeof(page_table_t), 1, &tmp);
     memory_set(table, 0, sizeof(page_table_t));
-    dir->tables[table_idx] = table;
-    dir->tablesPhysical[table_idx] = tmp | PAGE_PRESENT | PAGE_RW | PAGE_USER;
+    dir->page_directory_entries[table_idx] = table;
+    dir->page_directory_entries_physical[table_idx] = tmp | PAGE_PRESENT | PAGE_RW | PAGE_USER;
     
 
     // Create pages for this table
@@ -62,10 +62,10 @@ void create_table(uint32_t address, page_directory_t* dir) {
 page_t* create_page(uint32_t address, page_directory_t* dir) {
     uint32_t table_idx = TABLE_INDEX_MASK(address);
     uint32_t page_idx = PAGE_INDEX_MASK(address);
-    if (!dir->tables[table_idx]) {
+    if (!dir->page_directory_entries[table_idx]) {
         create_table(address, dir);
     }
-    page_t* page = &(dir->tables[table_idx]->pages[page_idx]);
+    page_t* page = &(dir->page_directory_entries[table_idx]->pages[page_idx]);
 
     // Frame was already allocated
     if (page->frame != 0) {
@@ -86,11 +86,11 @@ page_t* get_page(uint32_t address, page_directory_t* dir) {
     uint32_t page_idx = PAGE_INDEX_MASK(address);
 
     // Create page table only when needed - lazy allocation
-    if (!dir->tables[table_idx]) {
+    if (!dir->page_directory_entries[table_idx]) {
         create_table(address, dir);
     }
 
-    return &(dir->tables[table_idx]->pages[page_idx]);
+    return &(dir->page_directory_entries[table_idx]->pages[page_idx]);
 }
 
 
