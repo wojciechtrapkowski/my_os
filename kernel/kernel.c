@@ -2,7 +2,7 @@
 #include "../cpu/timer.h"
 #include "../drivers/keyboard.h"
 #include "../drivers/screen.h"
-
+#include "../drivers/disk.h"
 #include <stdint.h>
 
 void kernel_main() {
@@ -22,13 +22,19 @@ void user_input(char *input) {
     } else if (strcmp(input, "PAGE") == 0) {
         // This should result in a page fault
         // but should be handled by the kernel
-        // User sees 4 GB of memory
-        uint32_t* ptr = (uint32_t*)0xA0000000; 
+        uint32_t* ptr = (uint32_t*)0xA0000000;
         *ptr = 123;
-        uint32_t* ptr2 = (uint32_t*)0xFFFFFFFF; 
-        *ptr2 = 456;
+    } else if (strcmp(input, "DISKREAD") == 0) {
+        uint32_t* ptr = (uint32_t*)0xFFFF;
+        *ptr = 123;
+        ata_dma_read(0, 0, 1, (void*)0xFFFF);
+    } else if (strcmp(input, "DISKWRITE") == 0) {
+        uint32_t* ptr = (uint32_t*)0xFFFF;
+        *ptr = 123;
+        ata_dma_write(0, 0, 1, (void*)0xFFFF);
+    } else {
+        kprint("You said: ");
+        kprint(input);
+        kprint("\n> ");
     }
-    kprint("You said: ");
-    kprint(input);
-    kprint("\n> ");
 }

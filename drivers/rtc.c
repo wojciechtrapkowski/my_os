@@ -19,7 +19,6 @@
 #define RTC_STATUS_A 0x0A
 #define RTC_STATUS_B 0x0B
 #define RTC_STATUS_C 0x0C
-#define IRQ_RTC IRQ8
 #define RTC_RATE 2
 
 #define TEXT_POSITION_X 13
@@ -164,7 +163,7 @@ void init_rtc() {
     port_byte_out(CMOS_DATA, (status & 0xF0) | 0x0F & RTC_RATE); // Rate: 32768Hz >> (15-6) = 2Hz
     
     // Register our RTC handler
-    register_interrupt_handler(IRQ_RTC, rtc_handler);
+    register_interrupt_handler(IRQ8, rtc_handler);
     
     // Re-enable interrupts
     __asm__ __volatile__("sti");

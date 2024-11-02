@@ -1,0 +1,36 @@
+# Bochs Configuration File
+
+# Memory size
+megs: 32
+
+# Boot from floppy
+boot: floppy
+
+# Floppy disk
+floppya: 1_44=floppy_bochs.img, status=inserted
+
+# Hard disk
+ata0-master: type=disk, path="disk_bochs.img", mode=flat, cylinders=20, heads=16, spt=63
+
+# Display settings
+display_library: sdl2
+
+# Log settings
+log: bochsout.txt
+logprefix: %t%e%d
+debug: action=ignore
+
+# Enable keyboard
+keyboard: type=mf
+
+# CPU settings
+cpu: count=1, ips=1000000
+
+# Enable mouse
+mouse: enabled=0
+
+# Enable VGA
+vga: extension=vbe
+
+# Enable serial port
+com1: enabled=1, mode=null

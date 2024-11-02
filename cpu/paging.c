@@ -31,7 +31,7 @@ void switch_page_directory(page_directory_t* dir)
 
 page_directory_t* create_page_directory() {
     // Allocate directory
-    page_directory_t* dir = (page_directory_t*) kmalloc(sizeof(page_directory_t), 1, NULL);
+    page_directory_t* dir = (page_directory_t*) phys_kmalloc(sizeof(page_directory_t), 1, NULL);
     memory_set(dir, 0, sizeof(page_directory_t));
 
     // Create few tables
@@ -46,7 +46,7 @@ page_directory_t* create_page_directory() {
 void create_table(uint32_t address, page_directory_t* dir) {
     uint32_t table_idx = TABLE_INDEX_MASK(address);
     uint32_t tmp;
-    page_table_t* table = (page_table_t*) kmalloc(sizeof(page_table_t), 1, &tmp);
+    page_table_t* table = (page_table_t*) phys_kmalloc(sizeof(page_table_t), 1, &tmp);
     memory_set(table, 0, sizeof(page_table_t));
     dir->page_directory_entries[table_idx] = table;
     dir->page_directory_entries_physical[table_idx] = tmp | PAGE_PRESENT | PAGE_RW | PAGE_USER;

@@ -27,8 +27,10 @@ load_kernel:
     call print_nl
 
     mov bx, KERNEL_OFFSET ; Read from disk and store in 0x1000
-    mov dh, 31 ; Our future kernel will be larger, make this big
-    mov dl, [BOOT_DRIVE]
+    mov dh, 48 ; Our future kernel will be larger, make this big
+    mov dl, 0x80        ; Select first hard drive
+    mov ch, 0x00        ; Head 0
+    mov cl, 0x02        ; Start from sector 2 (sector 1 is boot sector)
     call disk_load
     ret
 

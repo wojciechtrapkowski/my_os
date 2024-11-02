@@ -7,6 +7,7 @@
 #include "ports.h"
 #include "../drivers/rtc.h"    
 #include "paging.h"
+#include "../drivers/disk.h"    
 
 isr_t interrupt_handlers[256];
 
@@ -161,4 +162,6 @@ void irq_install() {
     init_keyboard();
     /* IRQ8: RTC */
     init_rtc();
+    /* IRQ14: ATA */
+    init_ata_dma();
 }

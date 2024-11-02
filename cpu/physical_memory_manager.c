@@ -9,16 +9,16 @@ static uint32_t* frames;
 static uint64_t n_frames;
 
 void init_physical_memory_manager() {
-    n_frames = (uint64_t) TABLES_PER_DIRECTORY * PAGES_PER_TABLE * PAGE_SIZE;
+    n_frames = (uint64_t)  PAGES_PER_TABLE * PAGE_SIZE ;
 
-    frames = (uint32_t*)kmalloc(n_frames / 32, 0, NULL);
+    frames = (uint32_t*)phys_kmalloc(n_frames / 32, 0, NULL);
     memory_set(frames, 0, n_frames / 32);
 }
 
 // Static function to set a bit in the frames bitset
 static void set_frame(uint32_t frame_addr)
 {
-   uint32_t frame = frame_addr / PAGE_SIZE; // 4 kB
+   uint32_t frame = frame_addr / PAGE_SIZE; 
    uint32_t idx = INDEX_FROM_BIT(frame);
    uint32_t off = OFFSET_FROM_BIT(frame);
    frames[idx] |= (0x1 << off);
@@ -54,6 +54,7 @@ static uint32_t find_first_free_frame()
         }
    }
 
+   PANIC("No free frames!");
    // no free frames
    return (uint32_t)-1;
 }
@@ -66,11 +67,6 @@ uint32_t alloc_frame()
     uint32_t idx = find_first_free_frame(); 
 
     // idx is now the index of the first free frame.
-
-    if (idx == (uint32_t)-1) {
-        // PANIC is just a macro that prints a message to the screen then hits an infinite loop.
-        PANIC("No free frames!");
-    }
 
     set_frame(idx*PAGE_SIZE); // this frame is now ours!
     return idx;
@@ -85,7 +81,11 @@ void free_frame(uint32_t frame_addr)
    frames[idx] &= ~(0x1 << off);
 }
 
-uint32_t kmalloc(size_t size, int align, uint32_t *phys_addr) {
+uint32_t phys_kmalloc(size_t size, int align, uint32_t *phys_addr) {
+    if (free_mem_addr + size > 0xFFFFFFFF) {
+        PANIC("Out of memory!");
+    }
+
     if (align == 1 && (free_mem_addr & 0x00000FFF)) {
         free_mem_addr &= 0xFFFFF000;
         free_mem_addr += 0x1000;

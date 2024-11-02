@@ -22,12 +22,20 @@ kernel.bin: boot/kernel_entry.o ${OBJ}
 kernel.elf: boot/kernel_entry.o ${OBJ}
 	i386-elf-ld -o $@ -Ttext 0x1000 $^ 
 
-run: os-image.bin
-	qemu-system-i386 -fda os-image.bin
+disk.img: os-image.bin
+	dd if=/dev/zero of=disk.img bs=1M count=64  	 # Creates a 64MB disk image
+	dd if=os-image.bin of=disk.img conv=notrunc      # Write bootloader and kernel
 
+run: os-image.bin disk.img
+	qemu-system-i386 -hda disk.img -monitor stdio 
+
+run_bochs: os-image.bin
+	dd if=os-image.bin of=floppy_bochs.img bs=512 conv=sync &
+	bochs -f bochsrc.txt
+	
 # Open the connection to qemu and load our kernel-object file with symbols
 debug: os-image.bin kernel.elf
-	qemu-system-i386 -s -fda os-image.bin -S -d int & 
+	qemu-system-i386 -s -hda disk.img -S & 
 	${GDB} -ex "target remote localhost:1234" -ex "symbol-file kernel.elf"
 
 # Flag -monitor stdio - means that we can interact with qemu through the terminal

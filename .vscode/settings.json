@@ -17,6 +17,7 @@
         "paging.h": "c",
         "stddef.h": "c",
         "cstring": "c",
-        "memory_consts.h": "c"
+        "memory_consts.h": "c",
+        "disk.h": "c"
     }
 }

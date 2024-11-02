@@ -31,3 +31,11 @@ i386-elf-ld -o function.bin -Ttext 0x0 --oformat binary function.o
 Disassembling
 
 ndisasm -b 32 function.bin
+
+Creating disk image
+
+bximage
+
+or 
+
+qemu-img create -f raw disk.img 100M
