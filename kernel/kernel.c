@@ -5,7 +5,7 @@
 #include "../drivers/disk.h"
 #include <stdint.h>
 #include "heap.h"
-
+#include "fs.h"
 KHEAP_T kheap;
 
 void kernel_main() {
@@ -15,7 +15,8 @@ void kernel_main() {
     irq_install();    
     kprepare_space_for_info();
 
-    kinit_heap();                                                          
+    init_heap();                   
+    init_filesystem();
 
     kprint("Type something, it will go through the kernel\n"
         "Type END to halt the CPU\n> ");
@@ -24,7 +25,12 @@ void kernel_main() {
 void user_input(char *input) {
     if (strcmp(input, "END") == 0) {
         kprint("Stopping the CPU. Bye!\n");
-        asm volatile("hlt");
+        fs_save();
+        // Wait for interrupt and then halt
+        // asm volatile("hlt");
+        while (1) {
+            asm volatile("nop");
+        }
     } else if (strcmp(input, "PAGE") == 0) {
         // This should result in a page fault
         // but should be handled by the kernel
@@ -57,6 +63,12 @@ void user_input(char *input) {
         kfree(ptr2);                     
         
         kprint("Freed 256 * 2 bytes\n");
+    } else if (strcmp(input, "MKDIR") == 0) {
+        fs_create_directory(NULL, "test");
+    } else if (strcmp(input, "MKFILE") == 0) {
+        fs_create_file(NULL, "test");
+    } else if (strcmp(input, "LIST") == 0) {
+        fs_list_directory(NULL);
     } else {
         kprint("You said: ");
         kprint(input);

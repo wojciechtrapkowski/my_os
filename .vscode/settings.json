@@ -19,6 +19,7 @@
         "cstring": "c",
         "memory_consts.h": "c",
         "disk.h": "c",
-        "pci.h": "c"
+        "pci.h": "c",
+        "variant": "c"
     }
 }

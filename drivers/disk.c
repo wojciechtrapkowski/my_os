@@ -30,7 +30,7 @@ uint32_t get_bmide_base() {
  * 4. Signal completion
  */
 static void ata_dma_interrupt_handler() {
-    kprint_hex(*(uint32_t*)0xFFFF);
+    asm("cli");
     uint32_t bmide_base = get_bmide_base();
 
     // Read command register to check if it was read or write
@@ -80,6 +80,7 @@ static void ata_dma_interrupt_handler() {
     // Signal completion
     dma_transfer_complete = 1;
     kprint("DMA transfer completed successfully\n");
+    asm("sti");
 }
 
 /** @brief Identify the drive

@@ -248,7 +248,7 @@ void kfree(void* ptr) {
  * @brief Initialize the heap
  * @param heap Heap structure
  */
-void kinit_heap() {
+void init_heap() {
     kheap.fblock = NULL;
     kheap_add_block(0x100000, 0x100000, 16);  /* add block to heap 
                                                 (starting 1MB mark and length of 1MB) 

@@ -105,6 +105,7 @@ void free_page(uint32_t address, page_directory_t* dir) {
 }
 
 void page_fault(registers_t* regs) {
+    asm("cli");
     // A page fault has occurred.
     // The faulting address is stored in the CR2 register.
     uint32_t faulting_address;
@@ -128,4 +129,5 @@ void page_fault(registers_t* regs) {
 
     // Try to handle page fault
     get_page(faulting_address, current_directory);
+    asm("sti");
 }

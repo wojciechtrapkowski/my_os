@@ -24,7 +24,7 @@ typedef struct KHEAP {
     KHEAPBLOCK_T* fblock;
 } KHEAP_T;
 
-void kinit_heap();
+void init_heap();
 void* kmalloc(uint32_t size);
 void kfree(void* ptr);
 

@@ -22,9 +22,11 @@ kernel.bin: boot/kernel_entry.o ${OBJ}
 kernel.elf: boot/kernel_entry.o ${OBJ}
 	i386-elf-ld -o $@ -Ttext 0x1000 $^ 
 
-disk.img: os-image.bin
-	dd if=/dev/zero of=disk.img bs=1M count=64  	 # Creates a 64MB disk image
-	dd if=os-image.bin of=disk.img conv=notrunc      # Write bootloader and kernel
+disk.img:
+	@if [ ! -f disk.img ]; then \
+		dd if=/dev/zero of=disk.img bs=512 count=131072; \
+	fi
+	@dd if=os-image.bin of=disk.img conv=notrunc bs=512 count=1024
 
 run: os-image.bin disk.img
 	qemu-system-i386 -hda disk.img -monitor stdio 
@@ -56,3 +58,4 @@ debug: os-image.bin kernel.elf
 clean:
 	rm -rf *.bin *.dis *.o os-image.bin *.elf
 	rm -rf kernel/*.o boot/*.bin drivers/*.o boot/*.o cpu/*.o libc/*.o
+	rm -rf disk.img
