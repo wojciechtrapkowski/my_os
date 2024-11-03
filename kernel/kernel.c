@@ -27,6 +27,7 @@ void user_input(char *input) {
     } else if (strcmp(input, "DISKREAD") == 0) {
         uint32_t* ptr = (uint32_t*)0xFFFF;
         *ptr = 123;
+        kprint_hex(*ptr);
         ata_dma_read(0, 0, 1, (void*)0xFFFF);
     } else if (strcmp(input, "DISKWRITE") == 0) {
         uint32_t* ptr = (uint32_t*)0xFFFF;

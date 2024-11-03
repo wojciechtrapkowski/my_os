@@ -18,6 +18,7 @@
         "stddef.h": "c",
         "cstring": "c",
         "memory_consts.h": "c",
-        "disk.h": "c"
+        "disk.h": "c",
+        "pci.h": "c"
     }
 }
