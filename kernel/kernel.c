@@ -47,9 +47,8 @@ void kernel_main() {
     kprint("Start Address: 0x"); kprint_hex((uint32_t)&_kernel_start);
     kprint("\nEnd Address: 0x");  kprint_hex((uint32_t)&_kernel_end);
     kprint("\nTotal Size: ");
-    char size[16];
-    int_to_ascii((uint32_t)(&_kernel_end - &_kernel_start), size);
-    kprint(size); kprint(" bytes\n");
+    kprint_int((uint32_t)(&_kernel_end - &_kernel_start));
+    kprint(" bytes\n");
 
     kprint("\nSystem ready! Type 'HELP' for commands\n> ");
 }
@@ -66,24 +65,27 @@ void user_input(char *input) {
     }
     else if (strcmp(input, "PAGE") == 0) {
         kprint("Testing page fault handler...\n");
-        uint32_t virt_addr = (20 << 22);
-        uint8_t* memory = (uint8_t*)virt_addr;
-        kprint("Writing to 0x"); kprint_hex(virt_addr); kprint("\n");
-        *memory = 123;
-
-        kprint("Testing invalid page access...\n");
         uint8_t* ptr = (uint8_t*)0xA0000000;
         *ptr = 123;
+        kprint("Page fault handler test complete\n");
     }
     else if (strcmp(input, "HEAP") == 0) {
         kprint("Testing heap allocation...\n");
         
-        uint32_t* ptr = (uint32_t*)kmalloc(256);
-        kprint("Allocated 256 bytes at 0x");
+        char* ptr = (char*)kmalloc(256);
+        if (ptr == NULL) {
+            kprint("Failed to allocate memory\n");
+            return;
+        }
+        kprint("Allocated 256 bytes at ");
         kprint_hex((uint32_t)ptr);
         
         char* ptr2 = (char*)kmalloc(256);
-        kprint("\nAllocated 256 bytes at 0x");
+        if (ptr2 == NULL) {
+            kprint("Failed to allocate memory\n");
+            return;
+        }
+        kprint("\nAllocated 256 bytes at ");
         kprint_hex((uint32_t)ptr2);
         
         kprint("\nFreeing memory...\n");

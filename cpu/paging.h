@@ -26,7 +26,7 @@
 #define SWAP_SIZE_MB     16                          // 16MB swap space
 #define PAGE_SIZE        4096                        // 4KB pages
 #define PAGES_IN_SWAP    (SWAP_SIZE_MB * 1024 * 1024) / PAGE_SIZE
-#define BITMAP_SIZE      (PAGES_IN_SWAP / 32)        // 32 bits per int
+#define BITMAP_SIZE      32                           // 4 MB
 
 // Page flags
 #define PAGE_PRESENT   0x1 

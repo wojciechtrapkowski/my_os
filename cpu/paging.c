@@ -15,7 +15,7 @@ crawler_state_t crawler = {
 
 page_stats_t stats = {0};
 
-static uint32_t swap_bitmap[BITMAP_SIZE] = {0};      // Initialize all to 0
+static uint32_t swap_bitmap[BITMAP_SIZE];
 static uint32_t next_free_index = 0;
 
 static page_stats_t crawl_pages() {
@@ -96,6 +96,8 @@ void init_paging() {
     register_interrupt_handler(14, page_fault);
 
     switch_page_directory(kernel_directory);
+
+    memory_set(swap_bitmap, 0, BITMAP_SIZE * sizeof(uint32_t));
 
     enable_paging();
     kprint("Paging enabled\n");
