@@ -23,9 +23,10 @@ kernel.bin: boot/kernel_entry.o ${OBJ}
 kernel.elf: boot/kernel_entry.o ${OBJ}
 	i386-elf-ld ${LDFLAGS} -o $@ -Ttext 0x1000 $^ 
 
+# 128 MB
 disk.img: os-image.bin
 	@if [ ! -f disk.img ]; then \
-		dd if=/dev/zero of=disk.img bs=512 count=131072; \
+		dd if=/dev/zero of=disk.img bs=512 count=262144; \
 	fi
 	@dd if=os-image.bin of=disk.img conv=notrunc bs=512 count=1024
 run: os-image.bin disk.img

@@ -1,118 +1,131 @@
 #include "../cpu/isr.h"
 #include "../cpu/timer.h"
 #include "../cpu/paging.h"
+#include "../cpu/physical_memory_manager.h"
 #include "../drivers/keyboard.h"
 #include "../drivers/screen.h"
 #include "../drivers/disk.h"
 #include <stdint.h>
 #include "heap.h"
 #include "fs.h"
-KHEAP_T kheap;
 
-// In order to set up heaps we need to know where the kernel starts and ends
 extern uint32_t _kernel_start;
-extern uint32_t _kernel_end;  
+extern uint32_t _kernel_end;
+
+void print_help() {
+    kprint("\nAvailable Commands:\n");
+    kprint("------------------\n");
+    kprint("Memory Tests:\n");
+    kprint("  PAGE     - Test page fault handling\n");
+    kprint("  HEAP     - Test heap allocation\n");
+    kprint("  SWAP     - Test memory swapping\n");
+    kprint("\nFile System:\n");
+    kprint("  MKDIR    - Create test directory\n");
+    kprint("  MKFILE   - Create test file\n");
+    kprint("  LIST     - Show directory contents\n");
+    kprint("\nSystem:\n");
+    kprint("  HELP     - Show this menu\n");
+    kprint("  END      - Halt system\n\n");
+}
 
 void kernel_main() {
     clear_screen();
+    kprint("OS Kernel Initializing...\n");
 
-    kprint("Initializing kernel...\n");
-    // kprepare_space_for_info(); // This will be used later
-
-    kprint("Installing ISRs...\n");
+    kprint("Setting up interrupts...\n");
     isr_install();
-    kprint("Installing IRQs...\n");
-    irq_install();    
+    irq_install();
 
-    kprint("Initializing heaps...\n");
-    init_heap();                   
-    // kprint("Initializing filesystem...\n");
-    // init_filesystem();
-    kprint("Initializing paging...\n");
+    kprint("Initializing memory management...\n");
+    init_physical_memory_manager();
     init_paging();
+    init_heap();
+    init_filesystem();
 
-    kprint("Kernel start: ");
-    kprint_hex((uint32_t)&_kernel_start);
-    kprint("\nKernel end: ");
-    kprint_hex((uint32_t)&_kernel_end);
-    kprint("\nKernel size: ");
-    char num[16];
-    int_to_ascii((uint32_t)(&_kernel_end - &_kernel_start), num);
-    kprint(num);
-    kprint(" bytes\n\n");
+    // Print kernel info
+    kprint("\nKernel Information:\n");
+    kprint("Start Address: 0x"); kprint_hex((uint32_t)&_kernel_start);
+    kprint("\nEnd Address: 0x");  kprint_hex((uint32_t)&_kernel_end);
+    kprint("\nTotal Size: ");
+    char size[16];
+    int_to_ascii((uint32_t)(&_kernel_end - &_kernel_start), size);
+    kprint(size); kprint(" bytes\n");
 
-    kprint("Type something, it will go through the kernel\n"
-        "Type END to halt the CPU\n> ");
+    kprint("\nSystem ready! Type 'HELP' for commands\n> ");
 }
 
 void user_input(char *input) {
-    if (strcmp(input, "END") == 0) {
-        kprint("Stopping the CPU. Bye!\n");
+    if (strcmp(input, "HELP") == 0) {
+        print_help();
+    }
+    else if (strcmp(input, "END") == 0) {
+        kprint("Saving file system...\n");
         fs_save();
-        // Wait for interrupt and then halt
-        // asm volatile("hlt");
-        while (1) {
-            asm volatile("nop");
-        }
-    } else if (strcmp(input, "PAGE") == 0) {
-        // This should result in a page fault
-        // but should be handled by the kernel
-        uint32_t virt_addr = (20 << 22);  // Directory 20, offset 0
-    uint8_t* memory = (uint8_t*)virt_addr;
-    *memory = 123;
+        kprint("System halting...\n");
+        while (1) { asm volatile("nop"); }
+    }
+    else if (strcmp(input, "PAGE") == 0) {
+        kprint("Testing page fault handler...\n");
+        uint32_t virt_addr = (20 << 22);
+        uint8_t* memory = (uint8_t*)virt_addr;
+        kprint("Writing to 0x"); kprint_hex(virt_addr); kprint("\n");
+        *memory = 123;
 
+        kprint("Testing invalid page access...\n");
         uint8_t* ptr = (uint8_t*)0xA0000000;
         *ptr = 123;
-        paging_test_swap();
-    } else if (strcmp(input, "DISKREAD") == 0) {
-        uint32_t* ptr = (uint32_t*)0xFFFF;
-        *ptr = 123;
-        kprint_hex(*ptr);
-        ata_dma_read(0, 0, 1, (void*)0xFFFF);
-    } else if (strcmp(input, "DISKWRITE") == 0) {
-        uint32_t* ptr = (uint32_t*)0xFFFF;
-        *ptr = 123;
-        ata_dma_write(0, 0, 1, (void*)0xFFFF);
-    } else if (strcmp(input, "HEAP") == 0) {
-        uint32_t* ptr;
-        char* ptr2;
-
-        ptr = (uint32_t*)kmalloc(256);
-        kprint("Allocated 256 bytes\n");
-        kprint_hex((uint32_t)ptr);
-        kprint("\n");
-
-        ptr2 = (char*)kmalloc(256);
-        kprint("Allocated another 256 bytes\n");
-        kprint_hex((uint32_t)ptr2);
-        kprint("\n");
-        kfree(ptr);                      
-        kfree(ptr2);                     
+    }
+    else if (strcmp(input, "HEAP") == 0) {
+        kprint("Testing heap allocation...\n");
         
-        kprint("Freed 256 * 2 bytes\n");
-    } else if (strcmp(input, "MKDIR") == 0) {
-        fs_create_directory(NULL, "test");
-    } else if (strcmp(input, "MKFILE") == 0) {
-        fs_create_file(NULL, "test");
-    } else if (strcmp(input, "LIST") == 0) {
-        fs_list_directory(NULL);
-    } else if (strcmp(input, "SWAP") == 0) {
-        // This should trigger a swap
-
-         for (uint32_t i = 0; i < 40; i++) {
+        uint32_t* ptr = (uint32_t*)kmalloc(256);
+        kprint("Allocated 256 bytes at 0x");
+        kprint_hex((uint32_t)ptr);
+        
+        char* ptr2 = (char*)kmalloc(256);
+        kprint("\nAllocated 256 bytes at 0x");
+        kprint_hex((uint32_t)ptr2);
+        
+        kprint("\nFreeing memory...\n");
+        kfree(ptr);
+        kfree(ptr2);
+        kprint("Heap test complete\n");
+    }
+    else if (strcmp(input, "SWAP") == 0) {
+        kprint("Testing memory swapping...\n");
+        for (uint32_t i = 0; i < 40; i++) {
             char* ptr = (char*)(0x17346000 + (i * 4096));
-            *ptr = 'A';  // This should eventually trigger swapping
-            // Add delay
+            *ptr = 'A';
+            kprint("Allocated page "); 
+            kprint_int(i); 
+            kprint("\n");
+            
+            // Delay to see swapping in action
             for (uint32_t j = 0; j < 10000000; j++) {
                 asm volatile("nop");
             }
         }
+        kprint("Reading first page: ");
         char* ptr = (char*)0x17346000;
         kprint(ptr);
-        kprint("\n");
-    } else {
-        kprint("You said: ");
-        kprint(input);
-        kprint("\n> ");
+        kprint("\nSwap test complete\n");
     }
+    else if (strcmp(input, "MKDIR") == 0) {
+        kprint("Creating directory 'test'...\n");
+        fs_create_directory(NULL, "test");
+        kprint("Directory created\n");
+    }
+    else if (strcmp(input, "MKFILE") == 0) {
+        kprint("Creating file 'test'...\n");
+        fs_create_file(NULL, "test");
+        kprint("File created\n");
+    }
+    else if (strcmp(input, "LIST") == 0) {
+        kprint("Directory contents:\n");
+        fs_list_directory(NULL);
+    }
+    else {
+        kprint("Unknown command. Type 'HELP' for available commands\n");
+    }
+    kprint("> ");
 }

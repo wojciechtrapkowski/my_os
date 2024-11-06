@@ -121,8 +121,8 @@ void print_rtc_datetime() {
     datetime_str[16] = ':';
     int_to_ascii_padded(seconds, datetime_str + 17);
     datetime_str[19] = '\0';
-    
-    kprint_at(datetime_str, TEXT_POSITION_X, TEXT_POSITION_Y);
+
+    kprint_at(datetime_str, 60, 1);
 }
 
 void rtc_handler(registers_t *regs) {    
@@ -138,6 +138,8 @@ void rtc_handler(registers_t *regs) {
 }
 
 void init_rtc() {
+    kprint_at("Date & Time: ", 64, 0);
+
     // So the time is printed right away
     print_rtc_datetime();
 

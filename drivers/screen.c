@@ -62,6 +62,12 @@ void kprint_hex(uint32_t n) {
     kprint(buffer);
 }
 
+void kprint_int(uint32_t n) {
+    char buffer[32];
+    int_to_ascii(n, buffer);
+    kprint(buffer);
+}
+
 void kprint_backspace() {
     int offset = get_cursor_offset()-2;
     int row = get_offset_row(offset);

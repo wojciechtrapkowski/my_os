@@ -14,6 +14,8 @@ void init_physical_memory_manager() {
    n_frames = mem_end_page / 0x1000;
    frames = (uint32_t*)phys_kmalloc(INDEX_FROM_BIT(n_frames), 0, NULL);
    memory_set(frames, 0, INDEX_FROM_BIT(n_frames));
+
+   kprint("Physical memory manager initialized\n");
 }
 
 // Static function to set a bit in the frames bitset

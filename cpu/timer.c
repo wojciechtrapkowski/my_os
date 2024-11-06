@@ -25,7 +25,6 @@ uint32_t get_tick_count() {
 void init_timer(uint32_t freq) {
     /* Install the function we just wrote */
     register_interrupt_handler(IRQ0, timer_callback);
-    kprint_at("Date & Time: ", 0, 0);
 
     /* Get the PIT value: hardware clock at 1193180 Hz */
     uint32_t divisor = 1193180 / freq;

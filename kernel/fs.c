@@ -15,7 +15,9 @@ static int index = 0;
  * @brief Serialize the tree to disk
  */
 static void serialize_tree() {
+#if FILE_SYSTEM_LOGGING
     kprint("Starting serialization...\n");
+#endif
     
     uint32_t sectors_needed = (NODE_COUNT * sizeof(fs_node_t) + 511) / 512;
     fs_node_t* disk_data = (fs_node_t*)kmalloc(sectors_needed * 512);
@@ -23,25 +25,33 @@ static void serialize_tree() {
     
     // Simple copy is now possible since we use indices instead of pointers
     memory_copy((uint8_t*)nodes, (uint8_t*)disk_data, NODE_COUNT * sizeof(fs_node_t));
-    
+
+#if FILE_SYSTEM_LOGGING
     kprint("Writing to disk...\n");
+#endif
     ata_dma_write(FS_TREE_LBA, 0, sectors_needed, disk_data);
+    wait_for_disk();
     
     kfree(disk_data);
+#if FILE_SYSTEM_LOGGING
     kprint("Serialization complete\n");
+#endif
 }
 
 /**
  * @brief Deserialize the tree from disk
  */
 static void deserialize_tree() {
+#if FILE_SYSTEM_LOGGING
     kprint("Starting deserialization...\n");
+#endif
     
     uint32_t sectors_needed = (NODE_COUNT * sizeof(fs_node_t) + 511) / 512;
     fs_node_t* disk_data = (fs_node_t*)kmalloc(sectors_needed * 512);
     
     // Read from disk
     ata_dma_read(FS_TREE_LBA, 0, sectors_needed, disk_data);
+    wait_for_disk();
     
     // Simple copy is now possible since we use indices
     memory_copy((uint8_t*)disk_data, (uint8_t*)nodes, NODE_COUNT * sizeof(fs_node_t));
@@ -64,7 +74,9 @@ static void deserialize_tree() {
     }
     
     kfree(disk_data);
+#if FILE_SYSTEM_LOGGING
     kprint("Deserialization complete\n");
+#endif
 }
 
 // Initialize filesystem

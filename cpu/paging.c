@@ -91,8 +91,6 @@ void enable_paging() {
 }
 
 void init_paging() {
-    init_physical_memory_manager();
-
     page_directory_t* kernel_directory = create_page_directory();
 
     register_interrupt_handler(14, page_fault);

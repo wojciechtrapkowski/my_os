@@ -6,14 +6,16 @@
 #define FS_TREE_ADDRESS 0xF00000
 #define FS_FILES_ADDRESS 0xFF0000
 
-#define FS_TREE_LBA 10000
-#define FS_FILES_LBA 20000
+#define FS_TREE_LBA 36864
+#define FS_FILES_LBA 69632
 
 #define FS_FILE 0x01
 #define FS_DIRECTORY 0x02
 
 #define MAX_NAME_LENGTH 32
 #define MAX_CHILDREN 16
+
+#define FILE_SYSTEM_LOGGING 0
 
 typedef struct fs_node {
     char name[MAX_NAME_LENGTH];

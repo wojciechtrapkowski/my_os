@@ -230,7 +230,9 @@ void init_ata_dma() {
 void ata_dma_read(uint32_t lba, uint8_t drive, uint16_t num_sectors, void* buffer) {
     uint32_t bmide_base = get_bmide_base();
     
+#if DISK_LOGGING
     kprint("BEGIN ATA DMA READ\n");
+#endif
     dma_transfer_complete = 0;
 
     // Clear any pending interrupts
@@ -269,7 +271,9 @@ void ata_dma_read(uint32_t lba, uint8_t drive, uint16_t num_sectors, void* buffe
     port_byte_out(ATA_PRIMARY_IO + 4, (uint8_t)(lba >> 8));
     port_byte_out(ATA_PRIMARY_IO + 5, (uint8_t)(lba >> 16));
 
+#if DISK_LOGGING
     kprint("Sending READ DMA command...\n");
+#endif
     port_byte_out(ATA_PRIMARY_IO + 7, ATA_COMMAND_READ_DMA);
 
     // Wait a bit for drive to process command
@@ -279,7 +283,9 @@ void ata_dma_read(uint32_t lba, uint8_t drive, uint16_t num_sectors, void* buffe
     }
 
     // Start the DMA transfer
+#if DISK_LOGGING
     kprint("Starting DMA transfer...\n");
+#endif
     port_byte_out(bmide_base + ATA_DMA_PRIMARY_CMD, 0x09);  // Start bit + Read bit
 }
 
