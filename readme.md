@@ -41,6 +41,7 @@ This is a custom very simple operating system implementation to learn how it wor
 0x00001000 - 0x001FFFFF    ~2MB    Kernel
     0x00001000             --      Kernel Start
     0x00010000             --      Physical Memory Allocator
+    0x00090000             --      Kernel Stack Start
     0x000F0000             --      Kernel Heap Start - Virtual Memory
     0x001FFFFF             --      Kernel End - Virtual Memory
 0x08000000                 --      End of Physical Memory (128MB) - it is fully mapped
