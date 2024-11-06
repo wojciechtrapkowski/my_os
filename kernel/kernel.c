@@ -60,6 +60,7 @@ void user_input(char *input) {
         uint32_t virt_addr = (20 << 22);  // Directory 20, offset 0
     uint8_t* memory = (uint8_t*)virt_addr;
     *memory = 123;
+
         uint8_t* ptr = (uint8_t*)0xA0000000;
         *ptr = 123;
         paging_test_swap();
@@ -98,7 +99,7 @@ void user_input(char *input) {
     } else if (strcmp(input, "SWAP") == 0) {
         // This should trigger a swap
 
-         for (uint32_t i = 0; i < 400000; i++) {
+         for (uint32_t i = 0; i < 40; i++) {
             char* ptr = (char*)(0x17346000 + (i * 4096));
             *ptr = 'A';  // This should eventually trigger swapping
             // Add delay
@@ -106,6 +107,9 @@ void user_input(char *input) {
                 asm volatile("nop");
             }
         }
+        char* ptr = (char*)0x17346000;
+        kprint(ptr);
+        kprint("\n");
     } else {
         kprint("You said: ");
         kprint(input);

@@ -20,6 +20,12 @@
 #define OFFSET_MASK(x) ((x) & 0xFFF)              // Get offset withing page
 #define PAGE_ALIGN (~(PAGE_SIZE - 1))
 
+
+#define SWAP_SIZE_MB     16                          // 16MB swap space
+#define PAGE_SIZE        4096                        // 4KB pages
+#define PAGES_IN_SWAP    (SWAP_SIZE_MB * 1024 * 1024) / PAGE_SIZE
+#define BITMAP_SIZE      (PAGES_IN_SWAP / 32)        // 32 bits per int
+
 // Page flags
 #define PAGE_PRESENT   0x1 
 #define PAGE_RW        0x2 
@@ -55,6 +61,22 @@ typedef struct page_directory
    **/
    uint32_t physicalAddr;
 } page_directory_t;
+
+typedef struct {
+    uint32_t last_run_time;
+    uint32_t normal_interval;    
+    uint32_t urgent_interval;    
+    uint32_t fault_count;        // Page faults since last run
+    uint32_t fault_threshold;    // Run if faults exceed this
+} crawler_state_t;
+
+typedef struct {
+    uint32_t total_pages;
+    uint32_t accessed_pages;
+    uint32_t dirty_pages;
+    uint32_t clean_pages;
+} page_stats_t;
+    
 
 void init_paging();
 

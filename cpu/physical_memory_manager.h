@@ -23,4 +23,8 @@ uint32_t alloc_frame();
 
 void free_frame(uint32_t frame_indx);
 
+uint32_t get_used_frames();
+
+uint32_t get_total_frames();
+
 #endif

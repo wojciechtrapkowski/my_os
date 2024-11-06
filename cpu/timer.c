@@ -18,6 +18,10 @@ static void timer_callback(registers_t* regs) {
     // kprint_at(tick_ascii, 6, 0);
 }
 
+uint32_t get_tick_count() {
+    return tick;
+}
+
 void init_timer(uint32_t freq) {
     /* Install the function we just wrote */
     register_interrupt_handler(IRQ0, timer_callback);

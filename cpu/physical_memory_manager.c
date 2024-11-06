@@ -98,3 +98,10 @@ uint32_t phys_kmalloc(size_t size, int align, uint32_t *phys_addr) {
     return ret;
 }
 
+uint32_t get_used_frames() {
+    return n_frames - (free_mem_addr / PAGE_SIZE);
+}
+
+uint32_t get_total_frames() {
+    return n_frames;
+}
