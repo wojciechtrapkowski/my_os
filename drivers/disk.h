@@ -24,6 +24,16 @@
 #define ATA_COMMAND_READ_DMA  0xC8
 #define ATA_COMMAND_WRITE_DMA 0xCA 
 
+#define ATA_SR_BSY     0x80    // Busy
+#define ATA_SR_DRDY    0x40    // Drive ready
+#define ATA_SR_DF      0x20    // Drive write fault
+#define ATA_SR_DSC     0x10    // Drive seek complete
+#define ATA_SR_DRQ     0x08    // Data request ready
+#define ATA_SR_CORR    0x04    // Corrected data
+#define ATA_SR_IDX     0x02    // Index
+#define ATA_SR_ERR     0x01    // Error
+
+
 #define BM_STATUS_DMA_ACTIVE    (1 << 0)  // Bit 0: DMA active
 #define BM_STATUS_ERROR         (1 << 1)  // Bit 1: Error
 #define BM_STATUS_IRQ          (1 << 2)   // Bit 2: Interrupt
@@ -44,6 +54,7 @@
 #define IDE_PCI_DEVICE     0x01    // Other possible values: 0x01, 0x1F, or 0x0C
 #define IDE_PCI_FUNCTION   0x01    // Other possible values: 0x00 or 0x01
 
+#define LOGGING 0
 
 /** @brief PRD (Physical Region Descriptor) entry
  * Fields:
@@ -62,5 +73,11 @@ void init_ata_dma();
 void ata_dma_read(uint32_t lba, uint8_t drive, uint16_t num_sectors, void* buffer);
 
 void ata_dma_write(uint32_t lba, uint8_t drive, uint16_t num_sectors, void* buffer);
+
+void ata_pio_read(uint32_t lba, uint8_t drive, uint16_t num_sectors, void* buffer);
+
+void ata_pio_write(uint32_t lba, uint8_t drive, uint16_t num_sectors, void* buffer);
+
+uint8_t wait_for_disk();
 
 #endif

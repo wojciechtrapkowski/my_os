@@ -64,16 +64,17 @@ void page_fault(registers_t* regs);
 
 page_directory_t* create_page_directory();
 
-void create_table(uint32_t address, page_directory_t* dir);
+page_table_t* create_table(uint32_t address, page_directory_t* dir);
 
 page_t* create_page(uint32_t address, page_directory_t* dir);
 
-page_t* get_page(uint32_t address, page_directory_t* dir);
+page_t* get_page(uint32_t virtual_address, page_directory_t* dir);
 
-void free_page(uint32_t address, page_directory_t* dir);
+void free_page(uint32_t virtual_address, page_directory_t* dir);
 
 void free_page_table(page_table_t* table);  
 
 void free_page_directory(page_directory_t* dir);
 
+void paging_test_swap();
 #endif

@@ -5,8 +5,12 @@
 #include <stdint.h>
 #include "pci.h"
 
-static volatile int dma_transfer_complete = 0;
+#define BM_STATUS_PORT 0x1F7    // Status register
+#define BM_STATUS_ERR  0x02     // Error bit
+#define BM_STATUS_IRQ  0x04     // Interrupt bit
+#define BM_STATUS_DMA  0x01     // DMA active bit
 
+static volatile int dma_transfer_complete = 0;
 
 /** @brief Get the Bus Master IDE base address. We need it to access the DMA control registers.
  * BMIDE Registers (relative to base):
@@ -39,12 +43,13 @@ static void ata_dma_interrupt_handler() {
     // Stop the DMA transfer
     port_byte_out(bmide_base + ATA_DMA_PRIMARY_CMD, 0);
     
+#if LOGGING  
     if (dma_cmd & 0x08) {
         kprint("DMA Read completed\n");
     } else {
         kprint("DMA Write completed\n");
     }
-
+#endif
     // Read drive status and DMA status
     uint8_t drive_status = port_byte_in(ATA_PRIMARY_IO + 7);
     uint8_t dma_status = port_byte_in(ATA_PRIMARY_CTRL + ATA_DMA_PRIMARY_STATUS);
@@ -79,6 +84,7 @@ static void ata_dma_interrupt_handler() {
 
     // Signal completion
     dma_transfer_complete = 1;
+
     kprint("DMA transfer completed successfully\n");
     asm("sti");
 }
@@ -287,7 +293,9 @@ void ata_dma_read(uint32_t lba, uint8_t drive, uint16_t num_sectors, void* buffe
 void ata_dma_write(uint32_t lba, uint8_t drive, uint16_t num_sectors, void* buffer) {
     uint32_t bmide_base = get_bmide_base();
     
+#if LOGGING
     kprint("BEGIN ATA DMA WRITE\n");
+#endif
     dma_transfer_complete = 0;
 
     // Clear any pending interrupts
@@ -325,7 +333,9 @@ void ata_dma_write(uint32_t lba, uint8_t drive, uint16_t num_sectors, void* buff
     port_byte_out(ATA_PRIMARY_IO + 4, (uint8_t)(lba >> 8));
     port_byte_out(ATA_PRIMARY_IO + 5, (uint8_t)(lba >> 16));
 
+#if LOGGING
     kprint("Sending WRITE DMA command...\n");
+#endif
     port_byte_out(ATA_PRIMARY_IO + 7, ATA_COMMAND_WRITE_DMA);
 
     // Wait for drive to be ready to accept data
@@ -334,6 +344,94 @@ void ata_dma_write(uint32_t lba, uint8_t drive, uint16_t num_sectors, void* buff
     } while ((status & 0x80) || !(status & 0x40));  // Wait while busy and not ready
 
     // Start the DMA transfer
+#if LOGGING
     kprint("Starting DMA transfer...\n");
+#endif
     port_byte_out(bmide_base + ATA_DMA_PRIMARY_CMD, 0x01);  // Start bit only (no read bit)
+}
+
+// TODO: VERIFY ATA PIO READ/WRITE
+
+/** @brief Read sectors from ATA drive using PIO
+ * 
+ * @param lba LBA address
+ * @param drive Drive number (0 or 1)
+ * @param num_sectors Number of sectors to read
+ * @param buffer Buffer to store the data
+ */
+void ata_pio_read(uint32_t lba, uint8_t drive, uint16_t num_sectors, void* buffer) {
+    port_byte_out(0x1F1, 0x00); // disable DMA
+    port_byte_out(ATA_PRIMARY_IO + 6, 0xE0 | ((lba >> 24) & 0x0F));
+    port_byte_out(ATA_PRIMARY_IO + 2, num_sectors);
+    port_byte_out(ATA_PRIMARY_IO + 3, (uint8_t)lba);
+    port_byte_out(ATA_PRIMARY_IO + 4, (uint8_t)(lba >> 8));
+    port_byte_out(ATA_PRIMARY_IO + 5, (uint8_t)(lba >> 16));
+    port_byte_out(ATA_PRIMARY_IO + 7, 0x20);  // Read command
+
+    // Wait for disk ready
+     if (wait_for_disk()) {
+        kprint("Disk read failed - timeout\n");
+        return;
+    }
+    // Write data
+    for (int i = 0; i < num_sectors * 256; i++) {
+        port_word_out(ATA_PRIMARY_IO, ((uint16_t*)buffer)[i]);
+    }
+
+    port_byte_out(0x1F1, 0x00); // disable DMA
+
+}
+
+/** @brief Write sectors to ATA drive using PIO
+ * 
+ * @param lba LBA address
+ * @param drive Drive number (0 or 1)
+ * @param num_sectors Number of sectors to write
+ * @param buffer Buffer to store the data
+ */
+void ata_pio_write(uint32_t lba, uint8_t drive, uint16_t num_sectors, void* buffer) {
+    port_byte_out(ATA_PRIMARY_IO + 6, 0xE0 | ((drive & 1) << 4) | ((lba >> 24) & 0x0F));
+    port_byte_out(ATA_PRIMARY_IO + 2, num_sectors);
+    port_byte_out(ATA_PRIMARY_IO + 3, (uint8_t)lba);
+    port_byte_out(ATA_PRIMARY_IO + 4, (uint8_t)(lba >> 8));
+    port_byte_out(ATA_PRIMARY_IO + 5, (uint8_t)(lba >> 16));
+    port_byte_out(ATA_PRIMARY_IO + 7, 0x30);  // Write command
+}
+
+/** 
+ * @brief Wait for the disk to be ready
+ * 
+ * @return 0 if ready, 1 if timeout
+ */
+uint8_t wait_for_disk() {
+    asm("sti");
+    uint32_t timeout = 10000000;
+    uint8_t status;
+    uint32_t bmide_base = get_bmide_base();
+    
+    while (timeout--) {
+        // Check both IDE status and Bus Master status
+        status = port_byte_in(BM_STATUS_PORT);
+        uint8_t bm_status = port_byte_in(bmide_base + 2);  // Bus Master Status port
+
+        // Check for errors
+        if (bm_status & BM_STATUS_ERR) {
+            kprint("DMA Error!\n");
+            return 2;
+        }
+
+        // Operation complete when:
+        // 1. DMA inactive (transfer complete)
+        // 2. Drive not busy
+        // 3. Drive ready
+        if (!(bm_status & BM_STATUS_DMA) && 
+            !(status & ATA_SR_BSY) && 
+            (status & ATA_SR_DRDY)) {
+            return 0;  // Success
+        }
+    }
+    
+    kprint("DMA timeout!\n");
+    asm("cli");
+    return 1;  // Timeout
 }

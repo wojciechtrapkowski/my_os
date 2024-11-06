@@ -14,8 +14,6 @@ isr_t interrupt_handlers[256];
 /* Can't do this with a loop because we need the address
  * of the function names */
 void isr_install() {
-    init_paging();
-
     set_idt_gate(0, (uint32_t)isr0);
     set_idt_gate(1, (uint32_t)isr1);
     set_idt_gate(2, (uint32_t)isr2);
