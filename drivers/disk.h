@@ -54,7 +54,7 @@
 #define IDE_PCI_DEVICE     0x01    // Other possible values: 0x01, 0x1F, or 0x0C
 #define IDE_PCI_FUNCTION   0x01    // Other possible values: 0x00 or 0x01
 
-#define LOGGING 0
+#define DISK_LOGGING 0
 
 /** @brief PRD (Physical Region Descriptor) entry
  * Fields:

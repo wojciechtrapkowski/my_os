@@ -7,8 +7,8 @@ page_directory_t* current_directory = NULL;
 
 crawler_state_t crawler = {
    .last_run_time = 0,
-   .normal_interval = 1000,
-   .urgent_interval = 100,     
+   .normal_interval = 100,
+   .urgent_interval = 10,     
    .fault_count = 0,
    .fault_threshold = 10,
 };
@@ -19,7 +19,7 @@ static uint32_t swap_bitmap[BITMAP_SIZE] = {0};      // Initialize all to 0
 static uint32_t next_free_index = 0;
 
 static page_stats_t crawl_pages() {
-    
+    kprint("Crawling pages!\n");
     for (uint32_t dir_idx = 0; dir_idx < 1024; dir_idx++) {
         page_table_t* table = current_directory->page_directory_entries[dir_idx];
         
@@ -32,9 +32,11 @@ static page_stats_t crawl_pages() {
                     uint32_t* pte = (uint32_t*)page;
                     
                     // Check bits before clearing
+                    // Accessed - set by CPU when page is READ or WRITE
                     if (*pte & PAGE_ACCESSED) {
                         stats.accessed_pages++;
                     }
+                    // Dirty - set by CPU when page is written to
                     if (*pte & PAGE_DIRTY) {
                         stats.dirty_pages++;
                     }
@@ -46,7 +48,20 @@ static page_stats_t crawl_pages() {
             }
         }
     }
-    
+
+#if LOG_PAGING
+    kprint("Crawling done!\n"); 
+    kprint("Stats: ");
+    kprint_hex(stats.total_pages);
+    kprint(" ");
+    kprint_hex(stats.accessed_pages);
+    kprint(" ");
+    kprint_hex(stats.dirty_pages);
+    kprint(" ");
+    kprint_hex(stats.clean_pages);
+    kprint("\n");
+#endif
+
     return stats;
 }
 
@@ -60,7 +75,7 @@ static void update_crawler(int force_run) {
     if (force_run || 
         current_time - crawler.last_run_time >= interval ||
         crawler.fault_count >= crawler.fault_threshold) {
-        
+
         crawl_pages();
         crawler.last_run_time = current_time;
         crawler.fault_count = 0;
@@ -234,27 +249,19 @@ static void free_swap_index(uint32_t index) {
     }
 }
 
-static page_table_t* select_page_to_evict() {
-    // Select table with maximum number of dirty pages
-    uint32_t max_dirty_pages = 0;
-    page_table_t* max_dirty_table = NULL;
-
+static page_t* select_page_to_evict() {
+    // Select first page that is not dirty
     for (int i=0; i<1024; i++) {
         if (current_directory->page_directory_entries[i]) {
-            uint32_t dirty_pages;
             for (int j=0; j<1024; j++) {
-                if (current_directory->page_directory_entries[i]->pages[j].dirty) {
-                    dirty_pages++;
+                if (!current_directory->page_directory_entries[i]->pages[j].dirty) {
+                    return &(current_directory->page_directory_entries[i]->pages[j]);
                 }
-            }
-            if (dirty_pages > max_dirty_pages) {
-                max_dirty_pages = dirty_pages;
-                max_dirty_table = current_directory->page_directory_entries[i];
             }
         }
     }
-    
-    return max_dirty_table;
+
+    return NULL;
 }
 
 void page_fault(registers_t* regs) {
@@ -294,7 +301,11 @@ void page_fault(registers_t* regs) {
     kprint("Need to perform swap!\n");
 
     // If there is no previously selected page to swap out, select one to evict.
-    page_table_t* page_swap = select_page_to_evict(); 
+    page_t* page_swap = select_page_to_evict(); 
+    if (page_swap == NULL) {
+        kprint("No page to swap out! Using hardcoded page 20,0. \n");
+        page_swap = &current_directory->page_directory_entries[20]->pages[0];
+    }
 
     // There is no memory to create new page, swap out the selected page
     size_t idx = find_first_free_frame();
@@ -302,23 +313,23 @@ void page_fault(registers_t* regs) {
     uint32_t page_index_on_disk = 0;
 
     if (page == NULL || idx == -1) {
-        void* frame_addr = (void*)(page_swap->pages[0].frame << 12);
-        if (!page->present) {
-            page_index_on_disk = page->frame;
+        void* frame_addr = (void*)(page_swap->frame << 12);
+        if (!page_swap->present) {
+            page_index_on_disk = page_swap->frame;
         }
         // Write the selected page to disk swap area.
         ata_dma_write(2048 + (swap_index * 8), 0, 8, frame_addr);
         wait_for_disk();
 
-        free_frame(page_swap->pages[0].frame);
+        free_frame(page_swap->frame);
 
         page = create_page(faulting_address, current_directory);
         if (page == NULL) {
             PANIC("Failed to create page!");
         }
         // Update the swap data for the evicted page.
-        page_swap->pages[0].present = 0;
-        page_swap->pages[0].frame = swap_index;
+        page_swap->present = 0;
+        page_swap->frame = swap_index;
 
         kprint("Page swapped out!\n");
 

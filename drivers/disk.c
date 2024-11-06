@@ -43,7 +43,7 @@ static void ata_dma_interrupt_handler() {
     // Stop the DMA transfer
     port_byte_out(bmide_base + ATA_DMA_PRIMARY_CMD, 0);
     
-#if LOGGING  
+#if DISK_LOGGING  
     if (dma_cmd & 0x08) {
         kprint("DMA Read completed\n");
     } else {
@@ -293,7 +293,7 @@ void ata_dma_read(uint32_t lba, uint8_t drive, uint16_t num_sectors, void* buffe
 void ata_dma_write(uint32_t lba, uint8_t drive, uint16_t num_sectors, void* buffer) {
     uint32_t bmide_base = get_bmide_base();
     
-#if LOGGING
+#if DISK_LOGGING
     kprint("BEGIN ATA DMA WRITE\n");
 #endif
     dma_transfer_complete = 0;
@@ -333,7 +333,7 @@ void ata_dma_write(uint32_t lba, uint8_t drive, uint16_t num_sectors, void* buff
     port_byte_out(ATA_PRIMARY_IO + 4, (uint8_t)(lba >> 8));
     port_byte_out(ATA_PRIMARY_IO + 5, (uint8_t)(lba >> 16));
 
-#if LOGGING
+#if DISK_LOGGING
     kprint("Sending WRITE DMA command...\n");
 #endif
     port_byte_out(ATA_PRIMARY_IO + 7, ATA_COMMAND_WRITE_DMA);
@@ -344,7 +344,7 @@ void ata_dma_write(uint32_t lba, uint8_t drive, uint16_t num_sectors, void* buff
     } while ((status & 0x80) || !(status & 0x40));  // Wait while busy and not ready
 
     // Start the DMA transfer
-#if LOGGING
+#if DISK_LOGGING
     kprint("Starting DMA transfer...\n");
 #endif
     port_byte_out(bmide_base + ATA_DMA_PRIMARY_CMD, 0x01);  // Start bit only (no read bit)

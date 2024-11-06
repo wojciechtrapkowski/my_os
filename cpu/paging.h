@@ -4,6 +4,8 @@
 #include "isr.h"
 #include "physical_memory_manager.h"
 
+#define LOG_PAGING 0
+
 // TODO: Find better place for this
 #define PANIC(msg) do { \
     kprint("PANIC: "); \
