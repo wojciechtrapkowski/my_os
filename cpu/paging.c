@@ -251,7 +251,11 @@ static void free_swap_index(uint32_t index) {
 
 static page_t* select_page_to_evict() {
     // Select first page that is not dirty
-    for (int i=0; i<1024; i++) {
+
+    // We don't want to evict pages from kernel space
+    const uint32_t start_table = 8;
+    
+    for (int i=start_table; i<1024; i++) {
         if (current_directory->page_directory_entries[i]) {
             for (int j=0; j<1024; j++) {
                 if (!current_directory->page_directory_entries[i]->pages[j].dirty) {
