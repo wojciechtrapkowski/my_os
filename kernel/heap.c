@@ -250,7 +250,7 @@ void kfree(void* ptr) {
  */
 void init_heap() {
     kheap.fblock = NULL;
-    kheap_add_block(0x100000, 0x100000, 16);  /* add block to heap 
+    kheap_add_block(0xF00000, 0x100000, 16);  /* add block to heap 
                                                 (starting 1MB mark and length of 1MB) 
                                                 with default block size of 16 bytes */
     kprint("Heap initialized\n");
