@@ -1,0 +1,29 @@
+\doxysection{screen.\+h}
+\hypertarget{screen_8h_source}{}\label{screen_8h_source}\index{drivers/screen.h@{drivers/screen.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ SCREEN\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ SCREEN\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#define\ VIDEO\_ADDRESS\ 0xb8000}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#define\ MAX\_ROWS\ 25}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#define\ MAX\_COLS\ 80}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#define\ WHITE\_ON\_BLACK\ 0x0f}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#define\ RED\_ON\_WHITE\ 0xf4}}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{comment}{/*\ Screen\ i/o\ ports\ */}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#define\ REG\_SCREEN\_CTRL\ 0x3d4}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#define\ REG\_SCREEN\_DATA\ 0x3d5}}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{comment}{/*\ Public\ kernel\ API\ */}}
+\DoxyCodeLine{00016\ \textcolor{keywordtype}{void}\ clear\_screen();}
+\DoxyCodeLine{00017\ \textcolor{keywordtype}{void}\ kprint\_at(\textcolor{keywordtype}{char}\ *message,\ \textcolor{keywordtype}{int}\ col,\ \textcolor{keywordtype}{int}\ row);}
+\DoxyCodeLine{00018\ \textcolor{keywordtype}{void}\ kprint(\textcolor{keywordtype}{char}\ *message);}
+\DoxyCodeLine{00019\ \textcolor{keywordtype}{void}\ kprint\_hex(uint32\_t\ n);}
+\DoxyCodeLine{00020\ \textcolor{keywordtype}{void}\ kprint\_backspace();}
+\DoxyCodeLine{00021\ \textcolor{keywordtype}{void}\ kprepare\_space\_for\_info();}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

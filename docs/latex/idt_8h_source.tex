@@ -1,0 +1,40 @@
+\doxysection{idt.\+h}
+\hypertarget{idt_8h_source}{}\label{idt_8h_source}\index{cpu/idt.h@{cpu/idt.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ IDT\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ IDT\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}type.h"{}}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#define\ KERNEL\_CS\ 0x08}}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00009\ \ \ \ \ uint16\_t\ low\_offset;\ \textcolor{comment}{/*\ Lower\ 16\ bits\ of\ handler\ function\ address\ */}}
+\DoxyCodeLine{00010\ \ \ \ \ uint16\_t\ selector;\ \textcolor{comment}{/*\ Kernel\ segment\ selector\ */}}
+\DoxyCodeLine{00011\ \ \ \ \ uint8\_t\ always0;}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{comment}{/*\ First\ byte}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ \ \ \ \ *\ Bit\ 7:\ "{}Interrupt\ is\ present"{}}}
+\DoxyCodeLine{00014\ \textcolor{comment}{\ \ \ \ \ *\ Bits\ 6-\/5:\ Privilege\ level\ of\ caller\ (0=kernel..3=user)}}
+\DoxyCodeLine{00015\ \textcolor{comment}{\ \ \ \ \ *\ Bit\ 4:\ Set\ to\ 0\ for\ interrupt\ gates}}
+\DoxyCodeLine{00016\ \textcolor{comment}{\ \ \ \ \ *\ Bits\ 3-\/0:\ bits\ 1110\ =\ decimal\ 14\ =\ "{}32\ bit\ interrupt\ gate"{}\ */}}
+\DoxyCodeLine{00017\ \ \ \ \ uint8\_t\ flags;\ }
+\DoxyCodeLine{00018\ \ \ \ \ uint16\_t\ high\_offset;\ \textcolor{comment}{/*\ Higher\ 16\ bits\ of\ handler\ function\ address\ */}}
+\DoxyCodeLine{00019\ \}\ \mbox{\hyperlink{struct____attribute____}{\_\_attribute\_\_}}((packed))\ idt\_gate\_t\ ;}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{comment}{/*\ A\ pointer\ to\ the\ array\ of\ interrupt\ handlers.}}
+\DoxyCodeLine{00023\ \textcolor{comment}{\ *\ Assembly\ instruction\ 'lidt'\ will\ read\ it\ */}}
+\DoxyCodeLine{00024\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00025\ \ \ \ \ uint16\_t\ limit;}
+\DoxyCodeLine{00026\ \ \ \ \ uint32\_t\ base;}
+\DoxyCodeLine{00027\ \}\ \mbox{\hyperlink{struct____attribute____}{\_\_attribute\_\_}}((packed))\ idt\_register\_t;}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#define\ IDT\_ENTRIES\ 256}}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{keywordtype}{void}\ set\_idt\_gate(\textcolor{keywordtype}{int}\ n,\ uint32\_t\ handler);}
+\DoxyCodeLine{00032\ \textcolor{keywordtype}{void}\ set\_idt();}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

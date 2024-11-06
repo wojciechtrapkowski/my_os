@@ -1,0 +1,20 @@
+\doxysection{ports.\+h}
+\hypertarget{ports_8h_source}{}\label{ports_8h_source}\index{cpu/ports.h@{cpu/ports.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ PORTS\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ PORTS\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ port\_byte\_in\ (uint16\_t\ port);}
+\DoxyCodeLine{00007\ \textcolor{keywordtype}{void}\ port\_byte\_out\ (uint16\_t\ port,\ uint8\_t\ data);}
+\DoxyCodeLine{00008\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{short}\ port\_word\_in\ (uint16\_t\ port);}
+\DoxyCodeLine{00009\ \textcolor{keywordtype}{void}\ port\_word\_out\ (uint16\_t\ port,\ uint16\_t\ data);}
+\DoxyCodeLine{00010\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ port\_dword\_in\ (uint32\_t\ port);}
+\DoxyCodeLine{00011\ \textcolor{keywordtype}{void}\ port\_dword\_out\ (uint32\_t\ port,\ uint32\_t\ data);}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00014\ }
+
+\end{DoxyCode}

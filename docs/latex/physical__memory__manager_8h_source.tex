@@ -1,0 +1,36 @@
+\doxysection{physical\+\_\+memory\+\_\+manager.\+h}
+\hypertarget{physical__memory__manager_8h_source}{}\label{physical__memory__manager_8h_source}\index{cpu/physical\_memory\_manager.h@{cpu/physical\_memory\_manager.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ PHYSICAL\_MEMORY\_MANAGER\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ PHYSICAL\_MEMORY\_MANAGER\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <stddef.h>}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ "{}../drivers/screen.h"{}}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ "{}../libc/mem.h"{}}}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#define\ INDEX\_FROM\_BIT(a)\ (a/(8*4))}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#define\ OFFSET\_FROM\_BIT(a)\ (a\%(8*4))}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#define\ PANIC(msg)\ kprint(msg);\ while(1);}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#define\ QEMU\_MAX\_MEMORY\ 0x8000000}}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{keywordtype}{void}\ init\_physical\_memory\_manager();}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ uint32\_t\ phys\_kmalloc(\textcolor{keywordtype}{size\_t}\ size,\ \textcolor{keywordtype}{int}\ align,\ uint32\_t\ *phys\_addr);}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ uint32\_t\ find\_first\_free\_frame();}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ uint32\_t\ alloc\_frame();}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{keywordtype}{void}\ free\_frame(uint32\_t\ frame\_indx);}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ uint32\_t\ get\_used\_frames();}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ uint32\_t\ get\_total\_frames();}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

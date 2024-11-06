@@ -1,0 +1,48 @@
+\doxysection{fs.\+h}
+\hypertarget{fs_8h_source}{}\label{fs_8h_source}\index{kernel/fs.h@{kernel/fs.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ FS\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ FS\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#define\ FS\_TREE\_ADDRESS\ 0xF00000}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#define\ FS\_FILES\_ADDRESS\ 0xFF0000}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#define\ FS\_TREE\_LBA\ 10000}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#define\ FS\_FILES\_LBA\ 20000}}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#define\ FS\_FILE\ 0x01}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#define\ FS\_DIRECTORY\ 0x02}}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#define\ MAX\_NAME\_LENGTH\ 32}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ MAX\_CHILDREN\ 16}}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structfs__node}{fs\_node}}\ \{}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keywordtype}{char}\ name[MAX\_NAME\_LENGTH];}
+\DoxyCodeLine{00020\ }
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keywordtype}{int}\ parent\_idx;}
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keywordtype}{int}\ children\_idx[MAX\_CHILDREN];}
+\DoxyCodeLine{00023\ \ \ \ \ uint32\_t\ num\_children;}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \ \ \ \ uint32\_t\ flags;}
+\DoxyCodeLine{00026\ \ \ \ \ uint32\_t\ size;}
+\DoxyCodeLine{00027\ \ \ \ \ uint32\_t*\ data;}
+\DoxyCodeLine{00028\ \}\ \mbox{\hyperlink{structfs__node}{fs\_node\_t}};}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{keywordtype}{void}\ init\_filesystem();}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \textcolor{keywordtype}{void}\ fs\_create\_directory(\mbox{\hyperlink{structfs__node}{fs\_node\_t}}*\ parent,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ name);}
+\DoxyCodeLine{00033\ \textcolor{keywordtype}{void}\ fs\_create\_file(\mbox{\hyperlink{structfs__node}{fs\_node\_t}}*\ parent,\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ name);}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{keywordtype}{void}\ fs\_read\_file(\mbox{\hyperlink{structfs__node}{fs\_node\_t}}*\ node);}
+\DoxyCodeLine{00036\ \textcolor{keywordtype}{void}\ fs\_write\_file(\mbox{\hyperlink{structfs__node}{fs\_node\_t}}*\ node);}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \textcolor{keywordtype}{void}\ fs\_list\_directory(\mbox{\hyperlink{structfs__node}{fs\_node\_t}}*\ node);}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \textcolor{keywordtype}{void}\ fs\_save();}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

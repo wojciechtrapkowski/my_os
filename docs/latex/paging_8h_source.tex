@@ -1,0 +1,105 @@
+\doxysection{paging.\+h}
+\hypertarget{paging_8h_source}{}\label{paging_8h_source}\index{cpu/paging.h@{cpu/paging.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ PAGING\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ PAGING\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}isr.h"{}}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}physical\_memory\_manager.h"{}}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#define\ LOG\_PAGING\ 0}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{comment}{//\ TODO:\ Find\ better\ place\ for\ this}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#define\ PANIC(msg)\ do\ \{\ \(\backslash\)}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\ \ \ \ kprint("{}PANIC:\ "{});\ \(\backslash\)}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\ \ \ \ kprint(msg);\ \(\backslash\)}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\ \ \ \ kprint("{}\(\backslash\)n"{});\ \(\backslash\)}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\ \ \ \ asm\ volatile("{}cli"{});\ \(\backslash\)}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\ \ \ \ asm\ volatile("{}hlt"{});\ \(\backslash\)}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\ \ \ \ for(;;);\ \(\backslash\)}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\}\ while(0)}}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{comment}{//\ Address\ masks}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#define\ TABLE\_INDEX\_MASK(x)\ ((x\ >>\ 22))\ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{//\ Get\ table\ index}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#define\ PAGE\_INDEX\_MASK(x)\ ((x\ >>\ 12)\ \&\ 0x3FF)\ \ \ \ }\textcolor{comment}{//\ Get\ index\ of\ page\ in\ table}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ OFFSET\_MASK(x)\ ((x)\ \&\ 0xFFF)\ \ \ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{//\ Get\ offset\ withing\ page}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#define\ PAGE\_ALIGN\ (\string~(PAGE\_SIZE\ -\/\ 1))}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#define\ SWAP\_SIZE\_MB\ \ \ \ \ 16\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{//\ 16MB\ swap\ space}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#define\ PAGE\_SIZE\ \ \ \ \ \ \ \ 4096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{//\ 4KB\ pages}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#define\ PAGES\_IN\_SWAP\ \ \ \ (SWAP\_SIZE\_MB\ *\ 1024\ *\ 1024)\ /\ PAGE\_SIZE}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#define\ BITMAP\_SIZE\ \ \ \ \ \ (PAGES\_IN\_SWAP\ /\ 32)\ \ \ \ \ \ \ \ }\textcolor{comment}{//\ 32\ bits\ per\ int}}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{comment}{//\ Page\ flags}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ PAGE\_PRESENT\ \ \ 0x1\ }}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#define\ PAGE\_RW\ \ \ \ \ \ \ \ 0x2\ }}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#define\ PAGE\_USER\ \ \ \ \ \ 0x4\ }}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#define\ PAGE\_ACCESSED\ \ 0x20}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#define\ PAGE\_DIRTY\ \ \ \ \ 0x40}}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structpage}{page}}}
+\DoxyCodeLine{00039\ \{}
+\DoxyCodeLine{00040\ \ \ \ uint32\_t\ present\ \ \ \ :\ 1;\ \ \ \textcolor{comment}{//\ Page\ present\ in\ memory}}
+\DoxyCodeLine{00041\ \ \ \ uint32\_t\ rw\ \ \ \ \ \ \ \ \ :\ 1;\ \ \ \textcolor{comment}{//\ Read-\/only\ if\ clear,\ readwrite\ if\ set}}
+\DoxyCodeLine{00042\ \ \ \ uint32\_t\ user\ \ \ \ \ \ \ :\ 1;\ \ \ \textcolor{comment}{//\ Supervisor\ level\ only\ if\ clear}}
+\DoxyCodeLine{00043\ \ \ \ uint32\_t\ accessed\ \ \ :\ 1;\ \ \ \textcolor{comment}{//\ Has\ the\ page\ been\ accessed\ since\ last\ refresh?}}
+\DoxyCodeLine{00044\ \ \ \ uint32\_t\ dirty\ \ \ \ \ \ :\ 1;\ \ \ \textcolor{comment}{//\ Has\ the\ page\ been\ written\ to\ since\ last\ refresh?}}
+\DoxyCodeLine{00045\ \ \ \ uint32\_t\ unused\ \ \ \ \ :\ 7;\ \ \ \textcolor{comment}{//\ Amalgamation\ of\ unused\ and\ reserved\ bits}}
+\DoxyCodeLine{00046\ \ \ \ uint32\_t\ frame\ \ \ \ \ \ :\ 20;\ \ \textcolor{comment}{//\ Frame\ address\ (shifted\ right\ 12\ bits)}}
+\DoxyCodeLine{00047\ \}\ \mbox{\hyperlink{structpage}{page\_t}};}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structpage__table}{page\_table}}}
+\DoxyCodeLine{00050\ \{}
+\DoxyCodeLine{00051\ \ \ \ \mbox{\hyperlink{structpage}{page\_t}}\ pages[1024];}
+\DoxyCodeLine{00052\ \}\ \mbox{\hyperlink{structpage__table}{page\_table\_t}};}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structpage__directory}{page\_directory}}}
+\DoxyCodeLine{00056\ \{}
+\DoxyCodeLine{00057\ \ \ \ \mbox{\hyperlink{structpage__table}{page\_table\_t}}*\ page\_directory\_entries[1024];}
+\DoxyCodeLine{00058\ \ \ \ uint32\_t\ page\_directory\_entries\_physical[1024];}
+\DoxyCodeLine{00064\ \ \ \ uint32\_t\ \mbox{\hyperlink{structpage__directory_a9cf43d86570bbd6bc2a211e47b0909d5}{physicalAddr}};}
+\DoxyCodeLine{00065\ \}\ \mbox{\hyperlink{structpage__directory}{page\_directory\_t}};}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00067\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00068\ \ \ \ \ uint32\_t\ last\_run\_time;}
+\DoxyCodeLine{00069\ \ \ \ \ uint32\_t\ normal\_interval;\ \ \ \ }
+\DoxyCodeLine{00070\ \ \ \ \ uint32\_t\ urgent\_interval;\ \ \ \ }
+\DoxyCodeLine{00071\ \ \ \ \ uint32\_t\ fault\_count;\ \ \ \ \ \ \ \ \textcolor{comment}{//\ Page\ faults\ since\ last\ run}}
+\DoxyCodeLine{00072\ \ \ \ \ uint32\_t\ fault\_threshold;\ \ \ \ \textcolor{comment}{//\ Run\ if\ faults\ exceed\ this}}
+\DoxyCodeLine{00073\ \}\ \mbox{\hyperlink{structcrawler__state__t}{crawler\_state\_t}};}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00076\ \ \ \ \ uint32\_t\ total\_pages;}
+\DoxyCodeLine{00077\ \ \ \ \ uint32\_t\ accessed\_pages;}
+\DoxyCodeLine{00078\ \ \ \ \ uint32\_t\ dirty\_pages;}
+\DoxyCodeLine{00079\ \ \ \ \ uint32\_t\ clean\_pages;}
+\DoxyCodeLine{00080\ \}\ \mbox{\hyperlink{structpage__stats__t}{page\_stats\_t}};}
+\DoxyCodeLine{00081\ \ \ \ \ }
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \textcolor{keywordtype}{void}\ init\_paging();}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \textcolor{keywordtype}{void}\ switch\_page\_directory(\mbox{\hyperlink{structpage__directory}{page\_directory\_t}}*\ new\_dir);}
+\DoxyCodeLine{00086\ }
+\DoxyCodeLine{00087\ \textcolor{keywordtype}{void}\ page\_fault(\mbox{\hyperlink{structregisters__t}{registers\_t}}*\ regs);}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \mbox{\hyperlink{structpage__directory}{page\_directory\_t}}*\ create\_page\_directory();}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \mbox{\hyperlink{structpage__table}{page\_table\_t}}*\ create\_table(uint32\_t\ address,\ \mbox{\hyperlink{structpage__directory}{page\_directory\_t}}*\ dir);}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00093\ \mbox{\hyperlink{structpage}{page\_t}}*\ create\_page(uint32\_t\ address,\ \mbox{\hyperlink{structpage__directory}{page\_directory\_t}}*\ dir);}
+\DoxyCodeLine{00094\ }
+\DoxyCodeLine{00095\ \mbox{\hyperlink{structpage}{page\_t}}*\ get\_page(uint32\_t\ virtual\_address,\ \mbox{\hyperlink{structpage__directory}{page\_directory\_t}}*\ dir);}
+\DoxyCodeLine{00096\ }
+\DoxyCodeLine{00097\ \textcolor{keywordtype}{void}\ free\_page(uint32\_t\ virtual\_address,\ \mbox{\hyperlink{structpage__directory}{page\_directory\_t}}*\ dir);}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \textcolor{keywordtype}{void}\ free\_page\_table(\mbox{\hyperlink{structpage__table}{page\_table\_t}}*\ table);\ \ }
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \textcolor{keywordtype}{void}\ free\_page\_directory(\mbox{\hyperlink{structpage__directory}{page\_directory\_t}}*\ dir);}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \textcolor{keywordtype}{void}\ paging\_test\_swap();}
+\DoxyCodeLine{00104\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

@@ -1,0 +1,72 @@
+\doxysection{disk.\+h}
+\hypertarget{disk_8h_source}{}\label{disk_8h_source}\index{drivers/disk.h@{drivers/disk.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ DISK\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ DISK\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <stdint.h>}\ }
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ ATA\_PRIMARY\_IO\ \ \ \ \ \ \ \ 0x1F0}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#define\ ATA\_SECONDARY\_IO\ \ \ \ \ \ 0x170}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ ATA\_PRIMARY\_CTRL\ \ \ \ \ \ 0x3F6}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#define\ ATA\_SECONDARY\_CTRL\ \ \ \ 0x374}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#define\ ATA\_DMA\_PRIMARY\_CMD\ \ \ 0x00}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ ATA\_DMA\_PRIMARY\_STATUS\ 0x02}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#define\ ATA\_DMA\_PRIMARY\_PRD\ \ \ 0x04}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#define\ ATA\_COMMAND\_READ\_DMA\ \ 0xC8}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#define\ ATA\_COMMAND\_WRITE\_DMA\ 0xCA\ }}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#define\ ATA\_SR\_BSY\ \ \ \ \ 0x80\ \ \ \ }\textcolor{comment}{//\ Busy}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#define\ ATA\_SR\_DRDY\ \ \ \ 0x40\ \ \ \ }\textcolor{comment}{//\ Drive\ ready}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#define\ ATA\_SR\_DF\ \ \ \ \ \ 0x20\ \ \ \ }\textcolor{comment}{//\ Drive\ write\ fault}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#define\ ATA\_SR\_DSC\ \ \ \ \ 0x10\ \ \ \ }\textcolor{comment}{//\ Drive\ seek\ complete}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#define\ ATA\_SR\_DRQ\ \ \ \ \ 0x08\ \ \ \ }\textcolor{comment}{//\ Data\ request\ ready}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ ATA\_SR\_CORR\ \ \ \ 0x04\ \ \ \ }\textcolor{comment}{//\ Corrected\ data}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#define\ ATA\_SR\_IDX\ \ \ \ \ 0x02\ \ \ \ }\textcolor{comment}{//\ Index}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#define\ ATA\_SR\_ERR\ \ \ \ \ 0x01\ \ \ \ }\textcolor{comment}{//\ Error}}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#define\ BM\_STATUS\_DMA\_ACTIVE\ \ \ \ (1\ <<\ 0)\ \ }\textcolor{comment}{//\ Bit\ 0:\ DMA\ active}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#define\ BM\_STATUS\_ERROR\ \ \ \ \ \ \ \ \ (1\ <<\ 1)\ \ }\textcolor{comment}{//\ Bit\ 1:\ Error}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#define\ BM\_STATUS\_IRQ\ \ \ \ \ \ \ \ \ \ (1\ <<\ 2)\ \ \ }\textcolor{comment}{//\ Bit\ 2:\ Interrupt}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#define\ BM\_CMD\_START\_BIT\ \ \ \ \ \ \ (1\ <<\ 0)\ \ \ }\textcolor{comment}{//\ Bit\ 0:\ Start/Stop}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#define\ BM\_CMD\_READ\_BIT\ \ \ \ \ \ \ \ (1\ <<\ 3)\ \ \ }\textcolor{comment}{//\ Bit\ 3:\ Read/Write}}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ \textcolor{comment}{//\ Identify\ drive}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#define\ ATA\_COMMAND\_IDENTIFY\ 0xEC}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#define\ ATA\_CAP\_DMA\ \ \ \ \ \ \ \ (1\ <<\ 8)\ \ }\textcolor{comment}{//\ Word\ 49,\ bit\ 8}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#define\ ATA\_CAP\_LBA\ \ \ \ \ \ \ \ (1\ <<\ 9)\ \ }\textcolor{comment}{//\ Word\ 49,\ bit\ 9}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#define\ ATA\_CAP\_UDMA\ \ \ \ \ \ \ (1\ <<\ 13)\ }\textcolor{comment}{//\ Word\ 88,\ bit\ 13}}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \textcolor{comment}{//\ PCI\ Related}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#define\ PCI\_COMMAND\ 0x04}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\#define\ PCI\_BUS\_MASTER\ 0x04}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\#define\ PCI\_BAR4\ \ \ \ \ \ \ \ \ \ \ 0x20\ \ \ \ }\textcolor{comment}{//\ Bus\ Master\ Base\ Address\ Register}}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#define\ IDE\_PCI\_BUS\ \ \ \ \ \ \ \ 0x00}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\#define\ IDE\_PCI\_DEVICE\ \ \ \ \ 0x01\ \ \ \ }\textcolor{comment}{//\ Other\ possible\ values:\ 0x01,\ 0x1F,\ or\ 0x0C}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#define\ IDE\_PCI\_FUNCTION\ \ \ 0x01\ \ \ \ }\textcolor{comment}{//\ Other\ possible\ values:\ 0x00\ or\ 0x01}}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#define\ DISK\_LOGGING\ 0}}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00065\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00066\ \ \ \ \ uint32\_t\ phys\_addr;}
+\DoxyCodeLine{00067\ \ \ \ \ uint32\_t\ byte\_count;}
+\DoxyCodeLine{00068\ \ \ \ \ uint16\_t\ end\_of\_table;}
+\DoxyCodeLine{00069\ \}\ \mbox{\hyperlink{struct____attribute____}{\_\_attribute\_\_}}((packed))\ PRDEntry;}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \textcolor{keywordtype}{void}\ init\_ata\_dma();}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \textcolor{keywordtype}{void}\ ata\_dma\_read(uint32\_t\ lba,\ uint8\_t\ drive,\ uint16\_t\ num\_sectors,\ \textcolor{keywordtype}{void}*\ buffer);}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \textcolor{keywordtype}{void}\ ata\_dma\_write(uint32\_t\ lba,\ uint8\_t\ drive,\ uint16\_t\ num\_sectors,\ \textcolor{keywordtype}{void}*\ buffer);}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \textcolor{keywordtype}{void}\ ata\_pio\_read(uint32\_t\ lba,\ uint8\_t\ drive,\ uint16\_t\ num\_sectors,\ \textcolor{keywordtype}{void}*\ buffer);}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \textcolor{keywordtype}{void}\ ata\_pio\_write(uint32\_t\ lba,\ uint8\_t\ drive,\ uint16\_t\ num\_sectors,\ \textcolor{keywordtype}{void}*\ buffer);}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ uint8\_t\ wait\_for\_disk();}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

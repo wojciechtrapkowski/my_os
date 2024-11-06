@@ -1,0 +1,100 @@
+\doxysection{isr.\+h}
+\hypertarget{isr_8h_source}{}\label{isr_8h_source}\index{cpu/isr.h@{cpu/isr.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#ifndef\ ISR\_H}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ ISR\_H}}
+\DoxyCodeLine{00003\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ "{}ports.h"{}}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ "{}../libc/string.h"{}}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ "{}../libc/mem.h"{}}}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \textcolor{comment}{/*\ ISRs\ reserved\ for\ CPU\ exceptions\ */}}
+\DoxyCodeLine{00011\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr0();}
+\DoxyCodeLine{00012\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr1();}
+\DoxyCodeLine{00013\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr2();}
+\DoxyCodeLine{00014\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr3();}
+\DoxyCodeLine{00015\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr4();}
+\DoxyCodeLine{00016\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr5();}
+\DoxyCodeLine{00017\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr6();}
+\DoxyCodeLine{00018\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr7();}
+\DoxyCodeLine{00019\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr8();}
+\DoxyCodeLine{00020\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr9();}
+\DoxyCodeLine{00021\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr10();}
+\DoxyCodeLine{00022\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr11();}
+\DoxyCodeLine{00023\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr12();}
+\DoxyCodeLine{00024\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr13();}
+\DoxyCodeLine{00025\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr14();}
+\DoxyCodeLine{00026\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr15();}
+\DoxyCodeLine{00027\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr16();}
+\DoxyCodeLine{00028\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr17();}
+\DoxyCodeLine{00029\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr18();}
+\DoxyCodeLine{00030\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr19();}
+\DoxyCodeLine{00031\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr20();}
+\DoxyCodeLine{00032\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr21();}
+\DoxyCodeLine{00033\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr22();}
+\DoxyCodeLine{00034\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr23();}
+\DoxyCodeLine{00035\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr24();}
+\DoxyCodeLine{00036\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr25();}
+\DoxyCodeLine{00037\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr26();}
+\DoxyCodeLine{00038\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr27();}
+\DoxyCodeLine{00039\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr28();}
+\DoxyCodeLine{00040\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr29();}
+\DoxyCodeLine{00041\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr30();}
+\DoxyCodeLine{00042\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ isr31();}
+\DoxyCodeLine{00043\ \textcolor{comment}{/*\ IRQ\ definitions\ */}}
+\DoxyCodeLine{00044\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ irq0();}
+\DoxyCodeLine{00045\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ irq1();}
+\DoxyCodeLine{00046\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ irq2();}
+\DoxyCodeLine{00047\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ irq3();}
+\DoxyCodeLine{00048\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ irq4();}
+\DoxyCodeLine{00049\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ irq5();}
+\DoxyCodeLine{00050\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ irq6();}
+\DoxyCodeLine{00051\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ irq7();}
+\DoxyCodeLine{00052\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ irq8();}
+\DoxyCodeLine{00053\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ irq9();}
+\DoxyCodeLine{00054\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ irq10();}
+\DoxyCodeLine{00055\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ irq11();}
+\DoxyCodeLine{00056\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ irq12();}
+\DoxyCodeLine{00057\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ irq13();}
+\DoxyCodeLine{00058\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ irq14();}
+\DoxyCodeLine{00059\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{void}\ irq15();}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\#define\ IRQ0\ 32}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\#define\ IRQ1\ 33}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\#define\ IRQ2\ 34}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#define\ IRQ3\ 35}}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\#define\ IRQ4\ 36}}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\#define\ IRQ5\ 37}}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\#define\ IRQ6\ 38}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\#define\ IRQ7\ 39}}
+\DoxyCodeLine{00069\ \textcolor{preprocessor}{\#define\ IRQ8\ 40}}
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\#define\ IRQ9\ 41}}
+\DoxyCodeLine{00071\ \textcolor{preprocessor}{\#define\ IRQ10\ 42}}
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\#define\ IRQ11\ 43}}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\#define\ IRQ12\ 44}}
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\#define\ IRQ13\ 45}}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\#define\ IRQ14\ 46}}
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\#define\ IRQ15\ 47}}
+\DoxyCodeLine{00077\ }
+\DoxyCodeLine{00078\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\{}
+\DoxyCodeLine{00079\ \ \ \ uint32\_t\ ds;\ \textcolor{comment}{/*\ Data\ segment\ selector\ */}}
+\DoxyCodeLine{00080\ \ \ \ uint32\_t\ edi,\ esi,\ ebp,\ useless,\ ebx,\ edx,\ ecx,\ eax;\ \textcolor{comment}{/*\ Pushed\ by\ pusha.\ */}}
+\DoxyCodeLine{00081\ \ \ \ uint32\_t\ int\_no,\ err\_code;\ \textcolor{comment}{/*\ Interrupt\ number\ and\ error\ code\ (if\ applicable)\ */}}
+\DoxyCodeLine{00082\ \ \ \ uint32\_t\ eip,\ cs,\ eflags,\ esp,\ ss;\ \textcolor{comment}{/*\ Pushed\ by\ the\ processor\ automatically\ */}}
+\DoxyCodeLine{00083\ \}\ \mbox{\hyperlink{structregisters__t}{registers\_t}};}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00085\ \textcolor{keywordtype}{void}\ isr\_install();}
+\DoxyCodeLine{00086\ \textcolor{keywordtype}{void}\ isr\_handler(\mbox{\hyperlink{structregisters__t}{registers\_t}}*\ r);}
+\DoxyCodeLine{00087\ \textcolor{keywordtype}{void}\ irq\_install();}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \textcolor{keyword}{typedef}\ void\ (*isr\_t)(\mbox{\hyperlink{structregisters__t}{registers\_t}}*);}
+\DoxyCodeLine{00090\ \textcolor{keywordtype}{void}\ register\_interrupt\_handler(uint8\_t\ n,\ isr\_t\ handler);}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \textcolor{keyword}{extern}\ isr\_t\ interrupt\_handlers[256];}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

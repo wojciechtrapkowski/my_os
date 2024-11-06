@@ -1,0 +1,33 @@
+\doxysection{heap.\+h}
+\hypertarget{heap_8h_source}{}\label{heap_8h_source}\index{kernel/heap.h@{kernel/heap.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#ifndef\ HEAP\_H}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#define\ HEAP\_H}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ "{}../libc/mem.h"{}}}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#define\ KHEAP\_BITMAP\_RESERVED\_BIT\ 5}}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_k_h_e_a_p_b_l_o_c_k}{KHEAPBLOCK}}\ \{}
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_k_h_e_a_p_b_l_o_c_k}{KHEAPBLOCK}}*\ next;}
+\DoxyCodeLine{00017\ \ \ \ \ uint32\_t\ size;}
+\DoxyCodeLine{00018\ \ \ \ \ uint32\_t\ used;}
+\DoxyCodeLine{00019\ \ \ \ \ uint32\_t\ bsize;}
+\DoxyCodeLine{00020\ \ \ \ \ uint32\_t\ lfb;}
+\DoxyCodeLine{00021\ \}\ \mbox{\hyperlink{struct_k_h_e_a_p_b_l_o_c_k}{KHEAPBLOCK\_T}};}
+\DoxyCodeLine{00022\ }
+\DoxyCodeLine{00023\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct\ }\mbox{\hyperlink{struct_k_h_e_a_p}{KHEAP}}\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \mbox{\hyperlink{struct_k_h_e_a_p_b_l_o_c_k}{KHEAPBLOCK\_T}}*\ fblock;}
+\DoxyCodeLine{00025\ \}\ \mbox{\hyperlink{struct_k_h_e_a_p}{KHEAP\_T}};}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{keywordtype}{void}\ init\_heap();}
+\DoxyCodeLine{00028\ \textcolor{keywordtype}{void}*\ kmalloc(uint32\_t\ size);}
+\DoxyCodeLine{00029\ \textcolor{keywordtype}{void}\ kfree(\textcolor{keywordtype}{void}*\ ptr);}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}
